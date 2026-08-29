@@ -1,0 +1,36 @@
+---
+
+- name: Configure jellyfin servers
+  hosts: jellyfin_servers
+  become: true
+  gather_facts: true
+  pre_tasks:
+    - name: Importing distro specific variables
+      tags: always
+      ansible.builtin.include_vars: "{{ item }}"
+      loop: "{{ [lookup('ansible.builtin.first_found', params) | default(omit, true)] }}"
+      vars:
+        params:
+          files:
+            - "{{ ansible_facts['distribution'] | lower | replace(' ', '_') }}-packages.yaml"
+            - "{{ ansible_facts['os_family'] | lower | replace(' ', '_') }}-packages.yaml"
+          paths:
+            - vars
+          skip: true
+
+    - name: Install jellyfin dependencies for portable installations
+      tags: jellyfin
+      when:
+        - jellyfin_portable_package | default(false)
+        - jellyfin_dependencies_packages is defined
+      ansible.builtin.package:
+        name: "{{ jellyfin_dependencies_packages }}"
+        state: present
+
+  roles:
+    - role: jellyfin
+      tags: jellyfin
+    - role: qbittorrent_nox
+      tags: qbittorrent_nox
+
+...
