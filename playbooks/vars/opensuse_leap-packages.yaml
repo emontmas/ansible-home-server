@@ -1,0 +1,19 @@
+---
+
+base_packages_distro:
+  intel-ucode: ucode-intel
+  linux-firmware-intel: kernel-firmware-intel
+  man-db: man
+  openssh: openssh-server
+
+jellyfin_portable_package: true
+jellyfin_dependencies_packages:
+  - fontconfig
+  - glibc
+  - google-noto-fonts
+  - libgcc_s1
+  - libjemalloc2
+  - libstdc++6
+  - sqlite
+
+...
