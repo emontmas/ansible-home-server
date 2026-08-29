@@ -1,0 +1,7 @@
+[project]
+org="emontmas"
+name="ansible-home"
+
+[build]
+command="bash"
+distro="debian13"
