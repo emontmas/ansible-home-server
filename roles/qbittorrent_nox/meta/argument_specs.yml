@@ -1,0 +1,34 @@
+---
+
+argument_specs:
+  main:
+    short_description: Install and configure qbittorrent-nox client
+    description: Install and configure qbittorrent-nox client
+    version_added: "1.0"
+    author: Elinor Montmasson
+    options:
+      qbittorrent_nox_packages:
+        description: Packages to be installed when qbittorrent-nox is present.
+        type: list
+        elements: str
+        default:
+          - qbittorrent-nox
+      qbittorrent_nox_port:
+        description: WebUI port
+        type: int
+        default: 8080
+      qbittorrent_nox_locale:
+        description: WebUI locale
+        type: str
+        default: en
+      qbittorrent_nox_user_config:
+        description: |-
+          Additional custom qBittorrent configuration.
+          This parameter is a dictionnary of sections from the qBittorrent configuration file with values to modify.
+          Each element is also a sub-dictionnary were every field is a configuration option in the section with the value to set.
+
+          This parameter can override any configuration set by other role parameters.
+          Example: setting "Preferences - WebUI\Port" will override value set by O(qbittorrent_nox_port).
+        type: dict
+
+...

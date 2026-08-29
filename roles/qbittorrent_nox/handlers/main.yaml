@@ -1,0 +1,16 @@
+---
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: Apply modified configuration
+  ansible.builtin.include_tasks: apply_qbittorrent_config.yaml
+
+- name: Restart qbittorrent client
+  ansible.builtin.systemd_service:
+    name: qbittorrent-nox
+    enabled: true
+    state: restarted
+
+...

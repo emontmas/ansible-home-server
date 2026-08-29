@@ -1,0 +1,27 @@
+---
+
+- name: Install qbittorrent-nox packages
+  ansible.builtin.package:
+    name: "{{ qbittorrent_nox_packages }}"
+    state: present
+  notify:
+    - "qbittorrent_nox : Reload systemd daemon"
+    - Restart qbittorrent client
+
+- name: Ensure configuration directory exists
+  become: true
+  ansible.builtin.file:
+    path: /var/lib/qbittorrent/.config/qBittorrent
+    state: directory
+    owner: qbt
+    group: qbt
+    mode: "0755"
+
+- name: Write configuration file
+  ansible.builtin.include_tasks:
+    file: set_config_section.yaml
+  loop: "{{ qbittorrent_nox_config | dict2items }}"
+  loop_control:
+    loop_var: section
+
+...

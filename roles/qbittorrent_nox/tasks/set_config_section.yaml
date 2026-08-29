@@ -1,0 +1,20 @@
+---
+
+- name: "Setting configuration section option"
+  become: true
+  community.general.ini_file:
+    path: /var/lib/qbittorrent/.config/qBittorrent/qBittorrent.conf
+    owner: qbt
+    group: qbt
+    mode: "0644"
+    no_extra_spaces: true
+    section: "{{ section.key }}"
+    option: "{{ option.key }}"
+    value: "{{ option.value }}"
+  loop: "{{ section.value | dict2items }}"
+  loop_control:
+    loop_var: option
+  notify:
+    - Apply modified configuration
+
+...

@@ -1,0 +1,28 @@
+---
+
+- name: Copy configuration as temporary file
+  ansible.builtin.copy:
+    remote_src: true
+    src: /var/lib/qbittorrent/.config/qBittorrent/qBittorrent.conf
+    dest: /var/lib/qbittorrent/qBittorrent.conf.bak
+    owner: qbt
+    group: qbt
+    mode: preserve
+- name: Stop qbittorrent
+  ansible.builtin.systemd_service:
+    name: qbittorrent-nox
+    state: stopped
+- name: Copy back configuration file
+  ansible.builtin.copy:
+    remote_src: true
+    src: /var/lib/qbittorrent/qBittorrent.conf.bak
+    dest: /var/lib/qbittorrent/.config/qBittorrent/qBittorrent.conf
+    owner: qbt
+    group: qbt
+    mode: preserve
+- name: Start qbittorrent
+  ansible.builtin.systemd_service:
+    name: qbittorrent-nox
+    state: started
+
+...
