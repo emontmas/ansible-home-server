@@ -1,0 +1,8 @@
+---
+
+- name: Uninstall jellyfin packages
+  ansible.builtin.package:
+    name: "{{ jellyfin_packages }}"
+    state: absent
+
+...

@@ -1,0 +1,57 @@
+---
+
+- name: Restore backup file
+  when:
+    - jellyfin_backup is defined
+    - jellyfin_backup != ''
+  notify:
+    - "jellyfin : Reload systemd daemon"
+    - Restart Jellyfin server
+    - Wait server is up
+    - Remove restore override
+  block:
+    - name: Stop Jellyfin server
+      ansible.builtin.systemd_service:
+        name: jellyfin
+        state: stopped
+
+    - name: Create destination file for backup
+      ansible.builtin.file:
+        path: /var/lib/jellyfin/ansible
+        state: directory
+        mode: "0755"
+
+    - name: Copy backup file
+      ansible.builtin.copy:
+        src: "{{ jellyfin_backup }}"
+        dest: /var/lib/jellyfin/ansible/{{ jellyfin_backup | basename }}
+        mode: "0644"
+        owner: jellyfin
+        group: jellyfin
+
+    - name: Set restore backup service override file
+      ansible.builtin.copy:
+        src: 10-restore.conf
+        dest: /run/systemd/system/jellyfin.service.d/
+        mode: "0644"
+        directory_mode: "0755"
+        owner: root
+        group: root
+
+    - name: Set restore parameter environment file
+      ansible.builtin.template:
+        src: jellyfin-restore-param.env.j2
+        dest: /run/jellyfin-restore-param.env
+        mode: "0644"
+        owner: jellyfin
+        group: jellyfin
+
+    # In case all previous backup restoration tasks were unchanged by the server
+    # isn't running for some reason (ex: no backup cleanup + previous error)
+    - name: Notify start if necessary
+      ansible.builtin.systemd_service:
+        name: jellyfin
+        state: started
+      check_mode: true
+
+...

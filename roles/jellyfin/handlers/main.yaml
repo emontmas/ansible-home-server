@@ -1,0 +1,23 @@
+---
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: Restart Jellyfin server
+  ansible.builtin.systemd_service:
+    name: jellyfin
+    enabled: true
+    state: restarted
+
+- name: Wait server is up
+  ansible.builtin.wait_for:
+    port: 8096
+    timeout: 20
+
+- name: Remove restore override
+  ansible.builtin.file:
+    path: /run/jellyfin-restore-param.env
+    state: absent
+
+...

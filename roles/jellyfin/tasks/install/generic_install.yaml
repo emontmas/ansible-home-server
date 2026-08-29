@@ -1,0 +1,116 @@
+---
+
+- name: Import generic install variables
+  ansible.builtin.include_vars: generic_install.yaml
+
+- name: Get libjemalloc path
+  ansible.builtin.command: ldconfig -p
+  register: jellyfin_ldconfig_cache
+  changed_when: false # No modification is done on the target
+
+- name: Set libjemalloc path
+  ansible.builtin.set_fact:
+    jellyfin_libjemalloc_path: >-
+      {{ jellyfin_ldconfig_cache.stdout_lines
+          | ansible.builtin.select('ansible.builtin.regex', 'libjemalloc.so')
+          | first | default('')
+          | ansible.builtin.regex_search('(?<==>\s).*libjemalloc\.so.*$') }}
+
+- name: Check libjemalloc is installed
+  ansible.builtin.assert:
+    that: jellyfin_libjemalloc_path is not none
+    msg: "libjemalloc isn't installed on the target but is required by jellyfin"
+
+
+- name: Create jellyfin group
+  ansible.builtin.group:
+    name: jellyfin
+    state: present
+
+- name: Create jellyfin user
+  ansible.builtin.user:
+    name: jellyfin
+    state: present
+
+- name: Create jellyfin data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0750"
+    owner: jellyfin
+    group: jellyfin
+  loop:
+   - /etc/jellyfin
+   - /var/cache/jellyfin
+   - /var/lib/jellyfin
+   - /var/log/jellyfin
+
+- name: Create jellyfin ffmpeg installation directory
+  ansible.builtin.file:
+    path: /opt/jellyfin-ffmpeg
+    state: directory
+    owner: jellyfin
+    group: jellyfin
+    mode: "0755"
+
+- name: Create local systemd system unit directory
+  ansible.builtin.file:
+    path: /usr/local/lib/systemd/system
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+
+- name: Install jellyfin generic portable package
+  notify: Restart Jellyfin server
+  block:
+    - name: Install portable jellyfin server package
+      ansible.builtin.unarchive:
+        remote_src: true
+        src: "{{ jellyfin_portable_package_url }}"
+        dest: /opt
+        extra_opts:   # Preserve file permissions from release archive
+          - "-p"
+        owner: jellyfin
+        group: jellyfin
+
+    - name: Install portable jellyfin ffmpeg package
+      ansible.builtin.unarchive:
+        remote_src: true
+        src: "{{ jellyfin_portable_package_ffmpeg_url }}"
+        dest: /opt/jellyfin-ffmpeg
+        extra_opts:   # Preserve file permissions from release archive
+          - "-p"
+        owner: jellyfin
+        group: jellyfin
+
+    - name: Install jellyfin systemd service
+      ansible.builtin.template:
+        src: jellyfin.service.j2
+        dest: /usr/local/lib/systemd/system/jellyfin.service
+        owner: root
+        group: root
+        mode: "0644"
+      notify: "jellyfin : Reload systemd daemon"
+
+    - name: Install jelluyfin service environment variables
+      ansible.builtin.template:
+        src: jellyfin.j2
+        dest: /etc/default/jellyfin
+        owner: root
+        group: root
+        mode: "0644"
+
+
+- name: Create jellyfin binary symlink
+  ansible.builtin.file:
+    path: /usr/local/bin/jellyfin
+    src: /opt/jellyfin/jellyfin
+    state: link
+    follow: false
+    mode: "0755"
+    owner: root
+    group: root
+
+...

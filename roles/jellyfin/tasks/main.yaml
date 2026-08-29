@@ -1,0 +1,23 @@
+---
+
+- name: Clean-up remaining backups from previous run
+  when: jellyfin_clean_backups
+  ansible.builtin.file:
+    path: /var/lib/jellyfin/ansible
+    state: absent
+
+- name: Install jellyfin
+  ansible.builtin.import_tasks: install.yaml
+
+- name: Create medias directories
+  when:
+    - jellyfin_media_directories is defined
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0775"
+    owner: jellyfin
+    group: jellyfin
+  loop: "{{ jellyfin_media_directories }}"
+
+...

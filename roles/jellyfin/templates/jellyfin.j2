@@ -1,0 +1,6 @@
+{{ lookup('ansible.builtin.url',
+           jellyfin_packaging_github_raw_content_url + '/debian/conf/jellyfin',
+           headers=jellyfin_github_api_headers, split_lines=false)
+    | ansible.builtin.replace('/usr/share/jellyfin/web', '/opt/jellyfin/jellyfin-web')
+    | ansible.builtin.replace('/usr/lib/jellyfin/libjemalloc.so', jellyfin_libjemalloc_path)
+    | ansible.builtin.replace('/usr/lib/jellyfin-ffmpeg/ffmpeg', '/opt/jellyfin-ffmpeg/ffmpeg') }}

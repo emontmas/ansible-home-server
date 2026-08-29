@@ -1,0 +1,30 @@
+---
+
+- name: Create backup
+  ansible.builtin.uri:
+    headers:
+      Authorization: >-
+        MediaBrowser
+        Client="Ansible",
+        Device="ansible-controller",
+        DeviceId="79e26056-b8c9-4109-b453-5a245de814b5",
+        Version="10.11.11",
+        Token="3686ad9df78a4c65b65dc422ecc3337b"
+    url: http://localhost:{{ jellyfin_port | default(8096) }}/Backup/Create
+    method: POST
+    body_format: json
+    body:
+      Metadata: true
+      Trickplay: true
+      Subtitles: true
+      Database: true
+  register: jellyfin_api_res
+  changed_when: true
+
+- name: Fetch backup archive
+  ansible.builtin.fetch:
+    src: "{{ jellyfin_api_res.json.Path }}"
+    dest: "{{ jellyfin_backup_dir }}/{{ jellyfin_api_res.json.ServerVersion }}/{{ inventory_hostname }}/"
+    flat: true
+
+...

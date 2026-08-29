@@ -1,0 +1,12 @@
+---
+
+- name: Install jellyfin packages
+  when: not jellyfin_portable_package
+  ansible.builtin.package:
+    name: "{{ jellyfin_packages }}"
+    state: present
+  notify:
+    - "jellyfin : Reload systemd daemon"
+    - Restart Jellyfin server
+
+...

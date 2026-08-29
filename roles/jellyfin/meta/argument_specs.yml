@@ -1,0 +1,100 @@
+---
+
+argument_specs:
+  main:
+    short_description: Install and configure a jellyfin server.
+    description: Install and configure a jellyfin server.
+    version_added: "1.0"
+    author: Elinor Montmasson
+    options:
+      jellyfin_packages:
+        description: Packages to be installed when jellyfin is present.
+        type: list
+        elements: str
+        default:
+          - jellyfin-server
+          - jellyfin-web
+
+      jellyfin_portable_package:
+        description: |-
+          True if jellyfin should be installed from the official portable Linux release
+          instead of from a package repository.
+          If true, O(jellyfin_packages) is ignored.
+        type: bool
+        default: false
+
+      jellyfin_portable_package_version:
+        description: |-
+          Jellyfin server version to install.
+          Only relevant when O(jellyfin_portable_package=true).
+
+          Either:
+            * V(latest) to install the latest stable version.
+            * A version name, in the X.Y.Z format.
+              B(The version must be a stable version available at https://repo.jellyfin.org/files/server/linux/stable/).
+        type: str
+        default: latest
+
+      jellyfin_portable_package_ffmpeg_version:
+        description: |-
+          Jellyfin-ffmpeg version to install.
+          Only relevant when O(jellyfin_portable_package=true).
+
+          Either:
+            * V(latest) to install the latest stable version.
+            * A version name, in the X.Y.Z-P format.
+
+          B(The jellyfin-ffmpeg version must be compatible with the server version).
+          For version compatibility, refer to https://repo.jellyfin.org/?path=/ffmpeg/linux.
+        type: str
+        default: latest
+
+      jellyfin_media_directories:
+        description: |-
+          List of directories containing medias to be loaded by jellyfin.
+          Directories are created when they do not exist.
+        type: list
+        elements: str
+
+      jellyfin_backup:
+        description: |-
+          Path to jellyfin backup .zip file to restore.
+          The backup file must have been generated through jellyfin built-in backup feature.
+        type: str
+
+      jellyfin_clean_backups:
+        description: |-
+          Before installing jellyfin, remove backup files from previous bakcup restoration
+          attempts, if any.
+        type: bool
+        default: true
+
+  uninstall:
+    short_description: Uninstall a jellyfin server. B(Not yet implemented)
+    description: Uninstall a jellyfin server. B(Not yet implemented)
+    version_added: "1.0"
+    author: Elinor Montmasson
+    options:
+      jellyfin_packages:
+        description: Packages to be installed when jellyfin is present.
+        type: list
+        elements: str
+        default:
+          - jellyfin-server
+          - jellyfin-web
+
+  backup:
+    short_description: |-
+      Create a backup of a jellyfin server configuration.
+      It does not backup the medias in themselves.
+      B(Not yet implemented)
+    description: Uninstall a jellyfin server. B(Not yet implemented)
+    version_added: "1.0"
+    author: Elinor Montmasson
+    options:
+      jellyfin_backup_dir:
+        description: Path to directory where backup archives are stored.
+        type: str
+        default: $HOME/.local/share/jellyfin-backups
+
+...

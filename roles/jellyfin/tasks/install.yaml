@@ -1,0 +1,14 @@
+---
+
+- name: Install portable jellyfin
+  when: jellyfin_portable_package
+  ansible.builtin.include_tasks: install/generic_install.yaml
+
+- name: Install jellyfin with the package manager
+  when: not jellyfin_portable_package
+  ansible.builtin.include_tasks: install/package_manager_install.yaml
+
+- name: Restore backup
+  ansible.builtin.import_tasks: install/restore_backup.yaml
+
+...

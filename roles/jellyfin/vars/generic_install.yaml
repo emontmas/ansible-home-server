@@ -1,0 +1,44 @@
+---
+
+jellyfin_github_api_header_token: "{{ github_token is defined | ansible.builtin.ternary({ 'Authorization': 'Bearer ' + github_token | default ('')}, {}) }}"
+jellyfin_github_api_base_headers: { 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2026-03-10'}
+jellyfin_github_api_headers: "{{ jellyfin_github_api_base_headers | ansible.builtin.combine(jellyfin_github_api_header_token) }}" #
+
+jellyfin_github_raw_content_url: https://raw.githubusercontent.com
+
+
+jellyfin_version: >-
+  {%- if jellyfin_portable_package_version == "latest" -%}
+    {{ (lookup('ansible.builtin.url', 'https://api.github.com/repos/jellyfin/jellyfin/releases/latest',
+              headers=jellyfin_github_api_headers) | ansible.builtin.from_json)["name"] }}
+  {%- else -%}
+    {{ jellyfin_portable_package_version }}
+  {%- endif -%}
+
+jellyfin_packaging_version: >-
+  {{ lookup('ansible.builtin.url', 'https://api.github.com/repos/jellyfin/jellyfin-packaging/releases',
+              headers=jellyfin_github_api_headers)
+    | ansible.builtin.from_json
+    | ansible.builtin.map(attribute="tag_name")
+    | ansible.builtin.select("ansible.builtin.regex", "v" + jellyfin_version, match_type="match")
+    | first | mandatory("No jellyfin packaging release for jellyfin version " + jellyfin_version) }}
+
+jellyfin_ffmpeg_version: >-
+  {%- if jellyfin_portable_package_ffmpeg_version == "latest" -%}
+    {{ (lookup('ansible.builtin.url', 'https://api.github.com/repos/jellyfin/jellyfin-ffmpeg/releases/latest',
+              headers=jellyfin_github_api_headers) | ansible.builtin.from_json)["tag_name"] | ansible.builtin.trim(chars="v") }}
+  {%- else -%}
+    {{ jellyfin_portable_package_ffmpeg_version }}
+  {%- endif -%}
+
+jellyfin_ffmpeg_major_version: "{{ jellyfin_ffmpeg_version | regex_search('^[0-9]+') }}"
+
+
+jellyfin_portable_package_url: >-
+  https://repo.jellyfin.org/files/server/linux/stable/v{{ jellyfin_version }}/amd64/jellyfin_{{ jellyfin_version }}-amd64.tar.gz
+jellyfin_portable_package_ffmpeg_url: >-
+  https://repo.jellyfin.org/files/ffmpeg/linux/{{ jellyfin_ffmpeg_major_version }}.x/{{ jellyfin_ffmpeg_version }}/amd64/jellyfin-ffmpeg_{{ jellyfin_ffmpeg_version }}_portable_linux64-gpl.tar.xz
+jellyfin_packaging_github_raw_content_url: >-
+  {{ jellyfin_github_raw_content_url }}/jellyfin/jellyfin-packaging/refs/tags/{{ jellyfin_packaging_version}}
+
+...
