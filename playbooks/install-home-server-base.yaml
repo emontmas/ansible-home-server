@@ -1,0 +1,43 @@
+---
+
+- name: Configure server distribution
+  hosts: servers
+  become: true
+  gather_facts: true
+  vars_files:
+    - packages.yaml
+  tasks:
+    - name: Importing distro specific variables
+      ansible.builtin.include_vars: "{{ item }}"
+      loop: "{{ [lookup('ansible.builtin.first_found', params) | default(omit, true)] }}"
+      vars:
+        params:
+          files:
+            - "{{ ansible_facts['distribution'] | lower | replace(' ', '_') }}-packages.yaml"
+            - "{{ ansible_facts['os_family'] | lower | replace(' ', '_') }}-packages.yaml"
+          paths:
+            - vars
+          skip: true
+
+    - name: Install base packages
+      ansible.builtin.package:
+        name: "{{ base_packages }}"
+        state: present
+
+    - name: Configure mounts in /etc/fstab
+      ansible.posix.mount:
+        backup: "{{ item.backup | default(omit) }}"
+        boot: "{{ item.boot | default(omit) }}"
+        dump: "{{ item.dump | default(omit) }}"
+        fstab: "{{ item.fstab | default(omit) }}"
+        fstype: "{{ item.fstype | default(omit) }}"
+        opts: "{{ item.opts | default(omit) }}"
+        opts_no_log: "{{ item.opts_no_log | default(omit) }}"
+        passno: "{{ item.passno | default(omit) }}"
+        path: "{{ item.path | default(omit) }}"
+        src: "{{ item.src | default(omit) }}"
+        state: "{{ item.state | default(omit) }}"
+      when: fstab_mounts is defined
+      loop: "{{ fstab_mounts }}"
+
+...

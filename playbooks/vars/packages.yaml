@@ -1,0 +1,34 @@
+---
+
+# The following packages are expected to be present on the host system before running anything:
+#   - Base distribution files, comes with installation.
+#   - Systemd, comes with the installation
+#   - Python interpreter, required to run Ansible itself.
+
+base_packages_generic:
+  - fd
+  - htop
+  - intel-gpu-tools
+  - intel-ucode
+  - iproute2
+  - less
+  - linux-firmware-intel
+  - man-db
+  - openssh
+  - parted
+  - pipewire
+  - pipewire-jack
+  - ripgrep
+  - tmux
+  - vim
+  - which
+  - wireplumber
+
+base_packages_distro: {} # To be overwritten by distro specific var files
+
+base_packages_distro_keys: "{{ base_packages_distro | dict2items | map(attribute='key') }}"
+base_packages_distro_values: "{{ base_packages_distro | dict2items | map(attribute='value') }}"
+
+base_packages: "{{ (base_packages_generic | reject('in', base_packages_distro_keys)) + base_packages_distro_values }}"
+
+...
