@@ -50,4 +50,18 @@
             state: "{{ item.state }}"
           loop: "{{ fstab_mounts }}"
 
+    - name: Add local network in firewalld home zone
+      tags: firewall
+      when: firewalld_enabled | default(false)
+      vars:
+        local_subnet: "{{ network_local_subnet | default(ansible_facts['default_ipv4']['network'] + '/' + ansible_facts['default_ipv4']['prefix']) }}"
+      ansible.builtin.command: firewall-cmd --zone=home --add-source={{ local_subnet }} --permanent
+      register: firewalld_cmd_res
+      changed_when: not ("ALREADY_ENABLED" in firewalld_cmd_res.stderr)
+      notify: Reload firewalld
+
+  handlers:
+    - name: Reload firewalld
+      ansible.builtin.command: firewall-cmd --reload
+
 ...
