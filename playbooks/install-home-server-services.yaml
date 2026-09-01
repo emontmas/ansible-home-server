@@ -34,6 +34,13 @@
       tags: qbittorrent_nox
 
   tasks:
+    - name: Add qbt user to jellyfin medias group
+      # Can't use tags here, nee both jellyfin and qbittorrent_nox roles to run
+      ansible.builtin.user:
+        append: true
+        name: qbt
+        groups: "{{ jellyfin_media_group | default(jellyfin) }}"
+
     - name: Create firwalld services
       tags: firewall
       when: firewalld_enabled | default(false)
