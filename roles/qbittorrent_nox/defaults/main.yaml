@@ -1,8 +1,9 @@
 ---
 
+qbittorrent_nox_webui_port: 8080
 qbittorrent_nox_locale: en
-qbittorrent_nox_port: 8080
 qbittorrent_nox_user_config: {}
+
 qbittorrent_nox_packages:
   - qbittorrent-nox
 

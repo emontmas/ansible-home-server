@@ -13,7 +13,7 @@ argument_specs:
         elements: str
         default:
           - qbittorrent-nox
-      qbittorrent_nox_port:
+      qbittorrent_nox_webui_port:
         description: WebUI port
         type: int
         default: 8080
@@ -28,7 +28,7 @@ argument_specs:
           Each element is also a sub-dictionnary were every field is a configuration option in the section with the value to set.
 
           This parameter can override any configuration set by other role parameters.
-          Example: setting "Preferences - WebUI\Port" will override value set by O(qbittorrent_nox_port).
+          Example: setting "Preferences - WebUI\Port" will override value set by O(qbittorrent_nox_webui_port).
         type: dict
 
 ...

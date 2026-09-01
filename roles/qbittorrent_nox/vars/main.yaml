@@ -3,7 +3,7 @@
 qbittorrent_nox_role_config:
   Preferences:
     General\Locale: "{{ qbittorrent_nox_locale }}"
-    WebUI\Port: "{{ qbittorrent_nox_port }}"
+    WebUI\Port: "{{ qbittorrent_nox_webui_port }}"
 
 qbittorrent_nox_config: "{{ qbittorrent_nox_role_config  | ansible.builtin.combine(qbittorrent_nox_user_config, recursive=true) }}"
 
