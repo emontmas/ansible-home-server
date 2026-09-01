@@ -24,20 +24,30 @@
         name: "{{ base_packages }}"
         state: present
 
-    - name: Configure mounts in /etc/fstab
-      ansible.posix.mount:
-        backup: "{{ item.backup | default(omit) }}"
-        boot: "{{ item.boot | default(omit) }}"
-        dump: "{{ item.dump | default(omit) }}"
-        fstab: "{{ item.fstab | default(omit) }}"
-        fstype: "{{ item.fstype | default(omit) }}"
-        opts: "{{ item.opts | default(omit) }}"
-        opts_no_log: "{{ item.opts_no_log | default(omit) }}"
-        passno: "{{ item.passno | default(omit) }}"
-        path: "{{ item.path | default(omit) }}"
-        src: "{{ item.src | default(omit) }}"
-        state: "{{ item.state | default(omit) }}"
+    - name: Configure mounts
       when: fstab_mounts is defined
-      loop: "{{ fstab_mounts }}"
+      block:
+        - name: Create mount points
+          ansible.builtin.file:
+            path: "{{ item.path }}"
+            state: directory
+            # This task only cares about the mount point existance and should not override any
+            # permissions set by later tasks
+          loop: "{{ fstab_mounts }}"
+
+        - name: Configure mounts in /etc/fstab
+          ansible.posix.mount:
+            backup: "{{ item.backup | default(omit) }}"
+            boot: "{{ item.boot | default(omit) }}"
+            dump: "{{ item.dump | default(omit) }}"
+            fstab: "{{ item.fstab | default(omit) }}"
+            fstype: "{{ item.fstype | default(omit) }}"
+            opts: "{{ item.opts | default(omit) }}"
+            opts_no_log: "{{ item.opts_no_log | default(omit) }}"
+            passno: "{{ item.passno | default(omit) }}"
+            path: "{{ item.path }}"
+            src: "{{ item.src | default(omit) }}"
+            state: "{{ item.state }}"
+          loop: "{{ fstab_mounts }}"
 
 ...
