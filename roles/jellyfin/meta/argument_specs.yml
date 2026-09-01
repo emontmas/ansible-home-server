@@ -85,10 +85,9 @@ argument_specs:
 
   backup:
     short_description: |-
-      Create a backup of a jellyfin server configuration.
-      It does not backup the medias in themselves.
-      B(Not yet implemented)
-    description: Uninstall a jellyfin server. B(Not yet implemented)
+      Create a backup of a jellyfin server configuration. It does not backup the medias in themselves.
+    description: |-
+      Create a backup of a jellyfin server configuration. It does not backup the medias in themselves.
     version_added: "1.0"
     author: Elinor Montmasson
     options:
