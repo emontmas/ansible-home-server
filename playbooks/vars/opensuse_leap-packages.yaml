@@ -16,4 +16,6 @@ jellyfin_dependencies_packages:
   - libstdc++6
   - sqlite
 
+firewalld_enabled: true
+
 ...
