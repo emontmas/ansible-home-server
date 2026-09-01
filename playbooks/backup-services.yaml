@@ -1,0 +1,13 @@
+---
+
+- name: Backup services
+  hosts: jellyfin_servers
+  gather_facts: false
+  tasks:
+    - name: Create jellyfin data backup
+      tags: jellyfin
+      ansible.builtin.import_role:
+        name: jellyfin
+        tasks_from: backup.yaml
+
+...
