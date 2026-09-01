@@ -21,10 +21,13 @@ base_packages_generic:
   - ripgrep
   - rsync
   - sudo
+  - tar
   - tmux
+  - unzip
   - vim
   - which
   - wireplumber
+  - zip
 
 base_packages_distro: {} # To be overwritten by distro specific var files
 
