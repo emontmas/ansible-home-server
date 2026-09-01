@@ -19,6 +19,8 @@ base_packages_generic:
   - pipewire
   - pipewire-jack
   - ripgrep
+  - rsync
+  - sudo
   - tmux
   - vim
   - which
