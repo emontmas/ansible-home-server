@@ -31,7 +31,7 @@
     - role: jellyfin
       tags: jellyfin
     - role: qbittorrent_nox
-      tags: qbittorrent_nox
+      tags: qbittorrent
 
   tasks:
     - name: Add qbt user to jellyfin medias group

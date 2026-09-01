@@ -8,6 +8,7 @@
     - packages.yaml
   tasks:
     - name: Importing distro specific variables
+      tags: always
       ansible.builtin.include_vars: "{{ item }}"
       loop: "{{ [lookup('ansible.builtin.first_found', params) | default(omit, true)] }}"
       vars:
