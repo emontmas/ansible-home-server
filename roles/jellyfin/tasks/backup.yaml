@@ -27,4 +27,8 @@
     src: "{{ jellyfin_api_res.json.Path }}"
     dest: "{{ jellyfin_backup_dir }}/{{ jellyfin_api_res.json.ServerVersion }}/{{ inventory_hostname }}/"
 
+- name: Display backup file path
+  ansible.builtin.debug:
+    msg: "Backup file saved at {{ jellyfin_backup_dir }}/{{ jellyfin_api_res.json.ServerVersion }}/{{ inventory_hostname }}/{{ jellyfin_api_res.json.Path }}"
+
 ...
