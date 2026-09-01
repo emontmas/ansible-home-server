@@ -3,7 +3,9 @@
 qbittorrent_nox_role_config:
   Preferences:
     General\Locale: "{{ qbittorrent_nox_locale }}"
+    WebUI\Password_PBKDF2: "@ByteArray({{ qbittorrent_nox_webui_password }})"
     WebUI\Port: "{{ qbittorrent_nox_webui_port }}"
+    WebUI\Username: "{{ qbittorrent_nox_webui_user }}"
 
 qbittorrent_nox_config: "{{ qbittorrent_nox_role_config  | ansible.builtin.combine(qbittorrent_nox_user_config, recursive=true) }}"
 

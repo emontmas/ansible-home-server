@@ -1,5 +1,7 @@
 ---
 
+qbittorrent_nox_webui_user: admin
+qbittorrent_nox_webui_password: pFbvL3T4gSD0sDOcuNmraA==:/fOLFcjAY0nl9acL7kbIJfKB6vRq79dW/icPhDrx28U7THCEiugBG1iKhXTqwOCJptexujFcO+8NDnpaFan3oA==
 qbittorrent_nox_webui_port: 8080
 qbittorrent_nox_locale: en
 qbittorrent_nox_user_config: {}
