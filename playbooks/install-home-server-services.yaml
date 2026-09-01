@@ -41,46 +41,20 @@
         name: qbt
         groups: "{{ jellyfin_media_group | default(jellyfin) }}"
 
-    - name: Create firwalld services
+    - name: Configure firewalld services
       tags: firewall
       when: firewalld_enabled | default(false)
-      ansible.builtin.template:
-        src: firewalld-service.xml.j2
-        dest: /etc/firewalld/services/{{ item.service }}.xml
-        owner: root
-        group: root
-        mode: "0644"
+      ansible.builtin.import_tasks: tasks/firewalld_services.yaml
       vars:
-        service_description: "{{ item.service_description }}"
-        service_port: "{{ item.service_port }}"
-        service_protocol: "{{ item.service_protocol }}"
-      loop:
-        - service: jellyfin
-          service_description: Jellyfin server
-          service_port: 8096
-          service_protocol: tcp
-        - service: qbittorrent-nox
-          service_description: QBittorent WebUI
-          service_port: 8080
-          service_protocol: tcp
-      notify: Reload firewalld
-
-  post_tasks:
-    - name: Enable firewalld services on home network
-      tags: firewall
-      when: firewalld_enabled | default(false)
-      ansible.posix.firewalld:
-        service: "{{ item }}"
-        state: enabled
-        permanent: true
-        immediate: true
         zone: home
-      loop:
-        - jellyfin
-        - qbittorrent-nox
-
-  handlers:
-    - name: Reload firewalld
-      ansible.builtin.command: firewall-cmd --reload
+        services:
+          - service_name: jellyfin
+            service_description: Jellyfin server
+            service_port: 8096
+            service_protocol: tcp
+          - service_name: qbittorrent-nox
+            service_description: QBittorent WebUI
+            service_port: 8080
+            service_protocol: tcp
 
 ...

@@ -1,0 +1,32 @@
+---
+
+- name: Create firwalld services files
+  ansible.builtin.template:
+    src: firewalld-service.xml.j2
+    dest: /etc/firewalld/services/{{ item.service_name }}.xml
+    owner: root
+    group: root
+    mode: "0644"
+  vars:
+    service_description: "{{ item.service_description }}"
+    service_port: "{{ item.service_port }}"
+    service_protocol: "{{ item.service_protocol }}"
+  loop: "{{ services }}"
+  register: firewalld_service_configuration_res
+
+- name: Reload firewalld
+  when: firewalld_service_configuration_res.changed
+  ansible.builtin.command: firewall-cmd --reload
+
+- name: Enable firewalld services in the given zone
+  tags: firewall
+  when: firewalld_enabled | default(false)
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    state: enabled
+    permanent: true
+    immediate: true
+    zone: "{{ zone | default(omit) }}"
+  loop: "{{ services | map(attribute='service_name') }}"
+
+...
