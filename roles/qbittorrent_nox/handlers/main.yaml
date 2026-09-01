@@ -9,7 +9,7 @@
 
 - name: Restart qbittorrent client
   ansible.builtin.systemd_service:
-    name: qbittorrent-nox
+    name: "{{ qbittorrent_nox_service_unit }}"
     enabled: true
     state: restarted
 

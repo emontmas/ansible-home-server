@@ -9,4 +9,6 @@ qbittorrent_nox_role_config:
 
 qbittorrent_nox_config: "{{ qbittorrent_nox_role_config  | ansible.builtin.combine(qbittorrent_nox_user_config, recursive=true) }}"
 
+qbittorrent_nox_service_unit: qbittorrent-nox{{ qbittorrent_nox_template_service | ternary('@' + qbittorrent_nox_user, '') }}
+
 ...

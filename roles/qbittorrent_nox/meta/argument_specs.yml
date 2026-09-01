@@ -30,6 +30,17 @@ argument_specs:
         type: str
         default: /var/lib/qbittorrent
 
+      qbittorrent_nox_template_service:
+        description: |-
+          If V(true), the role will consider that the qbittorrent-nox service takes the user to be run
+          under as template variable. The system service is then qbittorrent-nox@O(qbittorrent_nox_user).
+          This is the most common service packaging done in most distributions.
+
+          If false, the system service is then qbittorrent-nox, and it is considered that the unit file
+          already run the service under O(qbittorrent_nox_user).
+        type: bool
+        default: true
+
       qbittorrent_nox_webui_port:
         description: WebUI port
         type: int
@@ -50,6 +61,7 @@ argument_specs:
         description: WebUI locale
         type: str
         default: en
+
       qbittorrent_nox_user_config:
         description: |-
           Additional custom qBittorrent configuration.
