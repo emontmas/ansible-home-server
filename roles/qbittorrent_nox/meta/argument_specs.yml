@@ -13,6 +13,23 @@ argument_specs:
         elements: str
         default:
           - qbittorrent-nox
+
+      qbittorrent_nox_user:
+        description: |-
+          User owning qbittorrent and running its system service.
+          If the qbittorrent-nox pacakge already creates a user for qbittorrent, this variable
+          must be set accordingly.
+        type: str
+        default: qbt
+
+      qbittorrent_nox_user_home:
+        description: |-
+          Home directory for O(qbittorrent_nox_user).
+          If the qbittorrent-nox pacakge already creates a user for qbittorrent, this variable
+          must be set accordingly.
+        type: str
+        default: /var/lib/qbittorrent
+
       qbittorrent_nox_webui_port:
         description: WebUI port
         type: int

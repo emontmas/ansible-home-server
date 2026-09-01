@@ -1,11 +1,11 @@
 ---
 
-- name: "Setting configuration section option"
+- name: Setting configuration section option
   become: true
   community.general.ini_file:
-    path: /var/lib/qbittorrent/.config/qBittorrent/qBittorrent.conf
-    owner: qbt
-    group: qbt
+    path: "{{ qbittorrent_nox_user_home }}/.config/qBittorrent/qBittorrent.conf"
+    owner: "{{ qbittorrent_nox_user }}"
+    group: "{{ qbittorrent_nox_user }}"
     mode: "0644"
     no_extra_spaces: true
     section: "{{ section.key }}"

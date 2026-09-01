@@ -8,13 +8,21 @@
     - "qbittorrent_nox : Reload systemd daemon"
     - Restart qbittorrent client
 
+- name: Create qbittorrent-nox user
+  ansible.builtin.user:
+    name: "{{ qbittorrent_nox_user }}"
+    state: present
+    system: true
+    home: "{{ qbittorrent_nox_user_home }}"
+  notify: Restart qbittorrent client
+
 - name: Ensure configuration directory exists
   become: true
   ansible.builtin.file:
-    path: /var/lib/qbittorrent/.config/qBittorrent
+    path: "{{ qbittorrent_nox_user_home }}/.config/qBittorrent"
     state: directory
-    owner: qbt
-    group: qbt
+    owner: "{{ qbittorrent_nox_user }}"
+    group: "{{ qbittorrent_nox_user }}"
     mode: "0755"
 
 - name: Write configuration file
