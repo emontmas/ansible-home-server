@@ -1,11 +1,14 @@
 ---
 
+jellyfin_media_group: jellyfin
+
 jellyfin_portable_package: false
 jellyfin_portable_package_version: latest
 jellyfin_portable_package_ffmpeg_version: latest
 jellyfin_packages:
   - jellyfin-server
   - jellyfin-web
+
 jellyfin_backup_dir: "{{ lookup('ansible.builtin.env', 'HOME') }}/.local/share/jellyfin-backups"
 jellyfin_clean_backups: true
 

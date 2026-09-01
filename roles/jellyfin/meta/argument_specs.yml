@@ -56,6 +56,11 @@ argument_specs:
         type: list
         elements: str
 
+      jellyfin_media_group:
+        description: Group ownership given to media files and directories
+        type: str
+        default: jellyfin
+
       jellyfin_backup:
         description: |-
           Path to jellyfin backup .zip file to restore.

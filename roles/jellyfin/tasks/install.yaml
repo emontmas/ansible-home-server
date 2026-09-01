@@ -11,4 +11,10 @@
 - name: Restore backup
   ansible.builtin.import_tasks: install/restore_backup.yaml
 
+- name: Create media files and directory group
+  when: jellyfin_media_group != "jellyfin"
+  ansible.builtin.group:
+    name: "{{ jellyfin_media_group }}"
+    state: present
+
 ...

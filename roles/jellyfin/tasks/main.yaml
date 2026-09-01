@@ -17,7 +17,18 @@
     state: directory
     mode: "0775"
     owner: jellyfin
-    group: jellyfin
+    group: "{{ jellyfin_media_group }}"
+  loop: "{{ jellyfin_media_directories }}"
+
+- name: Set ownership of media files
+  when:
+    - jellyfin_media_directories is defined
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: jellyfin
+    group: "{{ jellyfin_media_group }}"
+    recurse: true
   loop: "{{ jellyfin_media_directories }}"
 
 ...
