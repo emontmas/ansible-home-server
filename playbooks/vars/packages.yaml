@@ -18,6 +18,7 @@ base_packages_generic:
   - parted
   - pipewire
   - pipewire-jack
+  - podman
   - ripgrep
   - rsync
   - sudo
