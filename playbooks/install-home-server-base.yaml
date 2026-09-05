@@ -21,6 +21,7 @@
           skip: true
 
     - name: Install base packages
+      tags: base_packages
       ansible.builtin.package:
         name: "{{ base_packages }}"
         state: present
