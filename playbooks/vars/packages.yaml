@@ -6,6 +6,12 @@
 #   - Python interpreter, required to run Ansible itself.
 
 base_packages_generic:
+  - cockpit
+  - cockpit-networkmanager
+  - cockpit-packagekit
+  - cockpit-packages
+  - cockpit-podman
+  - cockpit-storaged
   - fd
   - htop
   - intel-gpu-tools

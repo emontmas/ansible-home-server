@@ -62,6 +62,23 @@
       changed_when: not ("ALREADY_ENABLED" in firewalld_cmd_res.stderr)
       notify: Reload firewalld
 
+    - name: Enable cockpit WebUI
+      ansible.builtin.systemd_service:
+        name: cockpit.socket
+        enabled: true
+        state: started
+
+    # Firewalld already provides a cockpit service
+    - name: Enable firewalld cockpit service
+      tags: firewall
+      when: firewalld_enabled | default(false)
+      ansible.posix.firewalld:
+        service: cockpit
+        state: enabled
+        permanent: true
+        immediate: true
+        zone: home
+
   handlers:
     - name: Reload firewalld
       ansible.builtin.command: firewall-cmd --reload
