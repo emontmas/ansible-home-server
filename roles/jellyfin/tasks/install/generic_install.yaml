@@ -26,11 +26,15 @@
   ansible.builtin.group:
     name: jellyfin
     state: present
+    system: true
 
 - name: Create jellyfin user
   ansible.builtin.user:
     name: jellyfin
     state: present
+    system: true
+    home: /var/lib/jellyfin
+    shell: /usr/sbin/nologin
 
 - name: Create jellyfin data directories
   ansible.builtin.file:
@@ -39,6 +43,19 @@
     mode: "0750"
     owner: jellyfin
     group: jellyfin
+  loop:
+   - /etc/jellyfin
+   - /var/cache/jellyfin
+   - /var/lib/jellyfin
+   - /var/log/jellyfin
+
+- name: Set ownership of jellyfin data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: jellyfin
+    group: jellyfin
+    recurse: true
   loop:
    - /etc/jellyfin
    - /var/cache/jellyfin
