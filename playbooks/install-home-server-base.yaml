@@ -26,6 +26,31 @@
         name: "{{ base_packages }}"
         state: present
 
+    - name: Create admin user
+      tags: admin
+      ansible.builtin.user:
+        name: admin
+        groups: "{{ user_admin_groups | default(omit) }}"
+        password: "{{ user_admin_password }}"
+
+    - name: Add admin authorized SSH keys
+      tags: admin
+      ansible.posix.authorized_key:
+        user: admin
+        key: "{{ user_admin_ssh_pub_key }}"
+
+    # As of Ansible 13, the module community.general.sudoers doesn't support setting
+    # 'Defaults' directives. As it is desiered to allow admin user to use its own password,
+    # a template file is used instead for now.
+    - name: Configure admin sudo
+      tags: admin
+      ansible.builtin.template:
+        src: admin.sudoers.j2
+        dest: /etc/sudoers.d/admin
+        owner: root
+        group: root
+        mode: "0644"
+
     - name: Configure mounts
       when: fstab_mounts is defined
       block:
