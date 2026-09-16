@@ -111,7 +111,7 @@
         mode: "0644"
       notify: "jellyfin : Reload systemd daemon"
 
-    - name: Install jelluyfin service environment variables
+    - name: Install jellyfin service environment variables
       ansible.builtin.template:
         src: jellyfin.j2
         dest: /etc/default/jellyfin
