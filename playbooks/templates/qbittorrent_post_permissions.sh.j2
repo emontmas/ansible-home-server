@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+CONTENT_ROOT_PATH="${5}"
+
+# Downloaded media files need to be writable and owned by the jellyfin medias group
+# so that they can be correctly manipulated by other software.
+chmod -R ug=rwX,o=rX "$CONTENT_ROOT_PATH"
+chown -R :{{ jellyfin_media_group | default('jellyfin') }} "$CONTENT_ROOT_PATH"
