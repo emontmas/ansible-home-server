@@ -21,6 +21,14 @@
   register: jellyfin_api_res
   changed_when: true
 
+- name: Create destination directory
+  become: false
+  delegate_to: localhost
+  run_once: true
+  ansible.builtin.file:
+    path: "{{ jellyfin_backup_dir }}/{{ jellyfin_api_res.json.ServerVersion }}/{{ inventory_hostname }}/"
+    state: directory
+
 - name: Fetch backup archive
   ansible.posix.synchronize:
     mode: pull
@@ -29,6 +37,6 @@
 
 - name: Display backup file path
   ansible.builtin.debug:
-    msg: "Backup file saved at {{ jellyfin_backup_dir }}/{{ jellyfin_api_res.json.ServerVersion }}/{{ inventory_hostname }}/{{ jellyfin_api_res.json.Path }}"
+    msg: "Backup file saved at {{ jellyfin_backup_dir }}/{{ jellyfin_api_res.json.ServerVersion }}/{{ inventory_hostname }}/{{ jellyfin_api_res.json.Path | basename }}"
 
 ...
