@@ -1,13 +1,24 @@
 ---
 
-qbittorrent_nox_role_config:
+qbittorrent_nox_hook_post_download_path: "{{ qbittorrent_nox_user_home }}/hook_post_download"
+qbittorrent_nox_hook_post_download_command: '{{ qbittorrent_nox_hook_post_download_path }} \"%N\" \"%L\" \"%G\" \"%F\" \"%R\" \"%D\" \"%C\" \"%Z\" \"%T\" \"%I\" \"%J\" \"%K\"'
+
+qbittorrent_nox_role_config_webui:
   Preferences:
     General\Locale: "{{ qbittorrent_nox_locale }}"
     WebUI\Password_PBKDF2: "@ByteArray({{ qbittorrent_nox_webui_password }})"
     WebUI\Port: "{{ qbittorrent_nox_webui_port }}"
     WebUI\Username: "{{ qbittorrent_nox_webui_user }}"
 
-qbittorrent_nox_config: "{{ qbittorrent_nox_role_config  | ansible.builtin.combine(qbittorrent_nox_user_config, recursive=true) }}"
+qbittorrent_nox_role_config_hooks:
+  AutoRun:
+    enabled: true
+    program: "{{ qbittorrent_nox_hook_post_download_command }}"
+
+qbittorrent_nox_config:
+  "{{ qbittorrent_nox_role_config_webui
+      | ansible.builtin.combine((qbittorrent_nox_hook_post_download is defined) | ternary(qbittorrent_nox_role_config_hooks, {}))
+      | ansible.builtin.combine(qbittorrent_nox_user_config, recursive=true) }}"
 
 qbittorrent_nox_service_unit: qbittorrent-nox{{ qbittorrent_nox_template_service | ternary('@' + qbittorrent_nox_user, '') }}
 

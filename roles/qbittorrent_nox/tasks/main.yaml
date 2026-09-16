@@ -25,6 +25,15 @@
     group: "{{ qbittorrent_nox_user }}"
     mode: "0755"
 
+- name: Install post download hook
+  when: qbittorrent_nox_hook_post_download is defined
+  ansible.builtin.template:
+    src: "{{ qbittorrent_nox_hook_post_download }}"
+    dest: "{{ qbittorrent_nox_hook_post_download_path }}"
+    mode: "0744"
+    owner: "{{ qbittorrent_nox_user }}"
+    group: "{{ qbittorrent_nox_user }}"
+
 - name: Write configuration file
   ansible.builtin.include_tasks:
     file: set_config_section.yaml

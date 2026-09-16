@@ -62,6 +62,26 @@ argument_specs:
         type: str
         default: en
 
+      qbittorrent_nox_hook_post_download:
+        description: |-
+          Script or program to install and run after downloading a torrent.
+          The given script can be a jinja template, which will then be templatised.
+
+          The script is called with the following parametes:
+            * $1: Torrent name
+            * $2: Category
+            * $3: Tags (separated by comma)
+            * $4: Content path (same as root path for multifile torrent)
+            * $5: Root path (first torrent subdirectory path)
+            * $6: Save path
+            * $7: Number of files
+            * $8: Torrent size (bytes)
+            * $9: Current tracker
+            * $10: Info hash v1
+            * $11: Info hash v2
+            * $12: Torrent ID
+        type: str
+
       qbittorrent_nox_user_config:
         description: |-
           Additional custom qBittorrent configuration.
