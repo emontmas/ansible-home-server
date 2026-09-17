@@ -19,7 +19,6 @@
   ansible.builtin.command: firewall-cmd --reload
 
 - name: Enable firewalld services in the given zone
-  tags: firewall
   when: firewalld_enabled | default(false)
   ansible.posix.firewalld:
     service: "{{ item }}"
