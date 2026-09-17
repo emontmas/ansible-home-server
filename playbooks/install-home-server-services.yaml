@@ -57,4 +57,52 @@
             service_port: 8080
             service_protocol: tcp
 
+# containers:
+#   - src: compose file name.
+#     user: user owning the containers. Must already exist and have the necessary subuid / subgid configured.
+#     config_bind_directories: custom configuration for binded directories.
+#     ignore_bind_directories: binded directories to not create.
+#     firewalld_services: lists of firewalld services related to the containers to add and enable.
+
+- name: Configure podman containers
+  hosts: servers
+  become: true
+  tasks:
+    - name: Get users informations
+      tags: always
+      loop:
+        - passwd
+        - group
+      ansible.builtin.getent:
+        database: "{{ item }}"
+
+    - name: Run podman_quadlet_compose role
+      tags: containers
+      loop: "{{ containers }}"
+      vars:
+        users_facts: "{{ ansible_facts['getent_passwd'] }}"
+        groups_facts: "{{ ansible_facts['getent_group'] }}"
+
+        podman_quadlet_compose_src: "{{ item.src }}"
+        podman_quadlet_compose_user: "{{ item.user | default(omit) }}"
+        podman_quadlet_compose_config_bind_directories: "{{ item.config_bind_directories | default(omit) }}"
+        podman_quadlet_compose_ignore_bind_directories: "{{ item.ignore_bind_directories | default([]) }}"
+      ansible.builtin.include_role:
+        name: podman_quadlet_compose
+        apply:
+          tags: containers
+
+
+    - name: Configure containers firewalld services
+      tags: firewall
+      when: firewalld_enabled | default(false)
+      loop: "{{ containers }}"
+      vars:
+        zone: home
+        services: "{{ item.firewalld_services }}"
+      ansible.builtin.include_tasks:
+        file: tasks/firewalld_services.yaml
+        apply:
+          tags: firewall
+
 ...
