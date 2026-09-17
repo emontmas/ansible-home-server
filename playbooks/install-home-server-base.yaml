@@ -20,11 +20,13 @@
             - vars
           skip: true
 
+
     - name: Install base packages
       tags: base_packages
       ansible.builtin.package:
         name: "{{ base_packages }}"
         state: present
+
 
     - name: Create admin user
       tags: admin
@@ -51,6 +53,26 @@
         group: root
         mode: "0644"
 
+
+    - name: Create service users
+      tags: users
+      loop: "{{ users | dict2items }}"
+      ansible.builtin.user: "{{ {'name': item.key} | combine(item.value) }}"
+
+    - name: Force user home directories ownership
+      tags: users
+      loop: "{{ users | dict2items }}"
+      when:
+        - users_force_home_ownership | default(false)
+        - item.value.home is defined
+      ansible.builtin.file:
+        path: "{{ item.value.home }}"
+        state: directory
+        recurse: true
+        owner: "{{ item.key }}"
+        group: "{{ item.key }}"
+
+
     - name: Configure mounts
       when: fstab_mounts is defined
       block:
@@ -76,6 +98,8 @@
             src: "{{ item.src | default(omit) }}"
             state: "{{ item.state }}"
           loop: "{{ fstab_mounts }}"
+
+
 
     - name: Add local network in firewalld home zone
       tags: firewall
