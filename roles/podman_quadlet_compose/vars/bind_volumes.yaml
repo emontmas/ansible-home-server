@@ -1,0 +1,32 @@
+---
+
+podman_quadlet_compose_volumes_definitions:
+  "{{ podman_quadlet_compose_src_templated.services | dict2items | map(attribute='value.volumes') | flatten }}"
+
+# A compose file can describe volumes in multiple ways
+podman_quadlet_compose_volumes_short: "{{ podman_quadlet_compose_volumes_definitions | select('string')
+                                            | map('ansible.builtin.split', ':') | map('first') }}"
+podman_quadlet_compose_volumes_long: "{{ podman_quadlet_compose_volumes_definitions | select('mapping') }}"
+
+# Extract host directory binds declated at service-level
+podman_quadlet_compose_volumes_binded_service_level:
+  "{{ podman_quadlet_compose_volumes_short | select('ansible.builtin.match', '[./]')
+      + podman_quadlet_compose_volumes_long | selectattr('type', '==', 'bind') | map(attribute='source') }}"
+
+# Extract host directory binds declared as top-level volumes that may be shared by multiple containers
+podman_quadlet_compose_volumes_top_level:
+  "{{ podman_quadlet_compose_volumes_short | reject('ansible.builtin.match', '[./]')
+        + podman_quadlet_compose_volumes_long | selectattr('type', '==', 'volume') | map(attribute='source') }}"
+
+podman_quadlet_compose_volumes_binded_top_level:
+  "{{ podman_quadlet_compose_volumes_top_level
+        | map('ansible.builtin.extract', podman_quadlet_compose_src_templated.volumes | default([]))
+        | selectattr('driver', 'defined') | selectattr('driver', '==', 'local')
+        | selectattr('driver_opts.o', 'defined') | selectattr('driver_opts.o', '==', 'bind')
+        | map(attribute='driver_opts.device') }}"
+
+# Concatenate final list of host directory binds
+podman_quadlet_compose_volumes_binded:
+  "{{ podman_quadlet_compose_volumes_binded_service_level + podman_quadlet_compose_volumes_binded_top_level }}"
+
+...

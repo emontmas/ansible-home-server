@@ -1,0 +1,15 @@
+---
+
+- name: Setting unit section option
+  community.general.ini_file:
+    path: "{{ unit_file }}"
+    create: false
+    no_extra_spaces: true
+    section: "{{ section.key }}"
+    option: "{{ option.key }}"
+    value: "{{ option.value }}"
+  loop: "{{ section.value | dict2items }}"
+  loop_control:
+    loop_var: option
+
+...

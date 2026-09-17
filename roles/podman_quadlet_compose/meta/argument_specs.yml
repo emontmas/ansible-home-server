@@ -1,0 +1,76 @@
+---
+
+argument_specs:
+  main:
+    short_description: Generate from a compose file and install podman containers as quadlet units using podlet
+    description: |-
+      Generate from a compose file and install podman containers as quadlet units using podlet.
+      The quadlet units are installed and run under a specified user.
+      Unit generation is performed on V(localhost) which must have pdolet installed.
+    version_added: "1.0"
+    author: Elinor Montmasson
+    options:
+      podman_quadlet_compose_src_directory:
+        description: Directory containing container compose files.
+        type: str
+        default: "./containers"
+
+      podman_quadlet_compose_src:
+        description: |-
+          YAML compose file to use to generate container quadlet files to install.
+          This file can be a jinja templatefile. In that case, it will be pre-processed by jinja2 before
+          being given to podlet.
+          Should be in O(podman_quadlet_compose_src_directory).
+        type: str
+        required: true
+
+      podman_quadlet_compose_user:
+        description: |-
+          User owning and running the generated containers. This user must already exist or the role will fail.
+          If root, the containers are installed system wide and run rootfull.
+          If not root, the containers are installed under the user home directory and run rootless.
+        type: str
+        default: root
+
+      podman_quadlet_compose_create_bind_directories:
+        description: |-
+          If true, the role will run a task to create each binded host directories
+          through 'volumes' directives.
+
+          By default the directories will be:
+          * Owned by O(podman_quadlet_compose_user) and the group of the same name.
+          * Have mode V(0755).
+
+          To override these default parameters see O(podman_quadlet_compose_config_bind_directories)
+          and O(podman_quadlet_compose_ignore_bind_directories).
+        type: bool
+        default: true
+
+      podman_quadlet_compose_config_bind_directories:
+        description: |-
+          Set either the mode, user and/or group of binded directories.
+
+          Each directory to configure must be a sub-mapping and can contain one or more of
+          the following keys: V(user), V(group), V(mode).
+          There values are identical as what is expected of the ansible.builtin.file module.
+
+          Ignored if O(podman_quadlet_compose_create_bind_directories=false)
+        type: dict
+
+      podman_quadlet_compose_ignore_bind_directories:
+        description: |-
+          List of binded directories to no create even if O(podman_quadlet_compose_create_bind_directories=true).
+        type: list
+        elements: str
+
+      podman_quadlet_compose_additional_pod_config:
+        description: |-
+          Additional custom configuration for the pod unit.
+          This parameter is a dictionnary of sections from the pod unit file with values to add/modify.
+          Each element is also a sub-dictionnary were every field is a configuration option in the section with the value to set.
+
+          This parameter is taken into account after all other unit configuration done by the role,
+          so it can override previously set parameters.
+        type: dict
+
+...

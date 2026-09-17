@@ -1,0 +1,11 @@
+---
+
+podman_quadlet_compose_name: "{{ podman_quadlet_compose_src | basename | split('.') | first }}"
+
+podman_quadlet_compose_podlet_workdir: "{{ podman_quadlet_compose_src_directory }}/.podlet"
+podman_quadlet_compose_podlet_pod_workdir: "{{ podman_quadlet_compose_podlet_workdir }}/{{ podman_quadlet_compose_name }}"
+
+podman_quadlet_compose_src_path: "{{ podman_quadlet_compose_src_directory }}/{{ podman_quadlet_compose_src }}"
+podman_quadlet_compose_src_templated_path: "{{ podman_quadlet_compose_podlet_workdir }}/{{ podman_quadlet_compose_name }}.yaml"
+
+...

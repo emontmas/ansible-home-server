@@ -1,0 +1,156 @@
+---
+
+- name: Get user information
+  tags: always
+  ansible.builtin.user:
+    name: "{{ podman_quadlet_compose_user }}"
+  register: user_info
+  check_mode: true
+  changed_when: false
+  failed_when: user_info.state is not defined or user_info.state != "present"
+
+
+- name: Generate compose file from template
+  become: false
+  delegate_to: localhost
+  run_once: true
+  ansible.builtin.template:
+    src: "{{ podman_quadlet_compose_src_path }}"
+    dest: "{{ podman_quadlet_compose_src_templated_path  }}"
+  register: compose_template_res
+
+
+- name: Import YAML content of templated compose file
+  tags: always
+  ansible.builtin.set_fact:
+    podman_quadlet_compose_src_templated: "{{ lookup('ansible.builtin.file', podman_quadlet_compose_src_templated_path) | ansible.builtin.from_yaml }}"
+
+
+# There is no easy way to ensure idempotency of the quadlet generation tasks especially regarding
+# the podlet command run with ansible.builtin.command.
+# Therefore, the "changed" status flag of the template task determines if the quadlet generation tasks must be run.
+# The content of the podman_quadlet_compose_podlet_workdir should then not be tampered with
+# or this role might no work correctly.
+
+- name: Generate podman quadlet files from compose file
+  when: compose_template_res.changed | default(false)
+  become: false
+  delegate_to: localhost
+  run_once: true
+  block:
+    - name: Clean previous podlet generator workdir
+      ansible.builtin.file:
+        path: "{{ podman_quadlet_compose_podlet_pod_workdir }}"
+        state: absent
+
+    - name: Create podlet generator workdir
+      ansible.builtin.file:
+        path: "{{ podman_quadlet_compose_podlet_pod_workdir }}"
+        state: directory
+
+    - name: Generate quadlet files with podlet
+      ansible.builtin.command:
+        argv:
+          - podlet
+          - -i
+          - -f={{ podman_quadlet_compose_podlet_pod_workdir }}
+          - --overwrite
+          - compose
+          - --pod
+          - "{{ podman_quadlet_compose_src_templated_path }}"
+
+    - name: Write configuration file
+      vars:
+        unit_file: "{{ podman_quadlet_compose_podlet_pod_workdir }}/{{ podman_quadlet_compose_src_templated.name }}.pod"
+      ansible.builtin.include_tasks:
+        file: set_config_section.yaml
+      loop: "{{ podman_quadlet_compose_additional_pod_config | dict2items }}"
+      loop_control:
+        loop_var: section
+
+  rescue:
+    # In case of error during generation of the quadlet files, the templated compose file
+    # must be cleaned to allow following role execution to re-run this block.
+    - name: Clean compose file
+      become: false
+      delegate_to: localhost
+      run_once: true
+      ansible.builtin.file:
+        path: "{{ podman_quadlet_compose_src_templated_path }}"
+        state: absent
+
+
+- name: Import binded volumes variables
+  ansible.builtin.include_vars:
+    file: bind_volumes.yaml
+
+- name: Create bind volume host directories
+  loop: "{{ podman_quadlet_compose_volumes_binded }}"
+  loop_control:
+    loop_var: volume
+  when:
+    - podman_quadlet_compose_create_bind_directories
+    - volume not in podman_quadlet_compose_ignore_bind_directories
+  vars:
+    mode_default: "0755"
+    user_default: "{{ podman_quadlet_compose_user }}"
+    group_default: "{{ podman_quadlet_compose_user }}"
+
+    config: "{{ podman_quadlet_compose_config_bind_directories[volume] | default({}) }}"
+  ansible.builtin.file:
+    path: "{{ volume }}"
+    state: directory
+    mode: "{{ config.mode | default(mode_default) }}"
+    owner: "{{ config.user | default(user_default) }}"
+    group: "{{ config.group | default(group_default) }}"
+
+
+- name: Install quadlet units
+  vars:
+    podman_quadlet_compose_quadlet_dir_root: /etc/containers/systemd
+    podman_quadlet_compose_quadlet_dir_user_suffix: "/.config/containers/systemd"
+    podman_quadlet_compose_quadlet_dir: >-
+      {{ (podman_quadlet_compose_user == "root") |
+            ternary(
+              podman_quadlet_compose_quadlet_dir_root,
+              user_info.home + podman_quadlet_compose_quadlet_dir_user_suffix) }}
+  block:
+    - name: Create systemd quadlet unit directory
+      ansible.builtin.file:
+        path: "{{ podman_quadlet_compose_quadlet_dir }}"
+        state: directory
+        owner: "{{ podman_quadlet_compose_user }}"
+        group: "{{ podman_quadlet_compose_user }}"
+        mode: "0755"
+
+    - name: Import container quadlet files
+      ansible.builtin.copy:
+        src: "{{ podman_quadlet_compose_podlet_pod_workdir }}/"
+        dest: "{{ podman_quadlet_compose_quadlet_dir }}"
+        owner: "{{ podman_quadlet_compose_user }}"
+        group: "{{ podman_quadlet_compose_user }}"
+        mode: "0644"
+
+
+- name: Start user systemd instance
+  when: podman_quadlet_compose_user != "root"
+  ansible.builtin.command: loginctl enable-linger {{ podman_quadlet_compose_user }}
+
+- name: Restart containers
+  become: true
+  become_user: "{{ podman_quadlet_compose_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "{{ (podman_quadlet_compose_user == 'root') | ternary('/run/user/' + user_info.uid | string, omit) }}"
+  block:
+    - name: Reload systemd daemon
+      ansible.builtin.systemd_service:
+        daemon_reload: true
+        scope: "{{ (podman_quadlet_compose_user != 'root') | ternary('user', 'system') }}"
+
+    - name: Restart pod
+      ansible.builtin.systemd_service:
+        name: "{{ podman_quadlet_compose_src_templated.name }}-pod.service"
+        state: restarted
+        scope: "{{ (podman_quadlet_compose_user != 'root') | ternary('user', 'system') }}"
+
+...
