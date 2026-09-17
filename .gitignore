@@ -1,0 +1,5 @@
+inventories
+
+# Directories containing temporary artifacts
+.podlet/
+backups/
