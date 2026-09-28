@@ -27,6 +27,6 @@ podman_quadlet_compose_volumes_binded_top_level:
 
 # Concatenate final list of host directory binds
 podman_quadlet_compose_volumes_binded:
-  "{{ podman_quadlet_compose_volumes_binded_service_level + podman_quadlet_compose_volumes_binded_top_level }}"
+  "{{ (podman_quadlet_compose_volumes_binded_service_level + podman_quadlet_compose_volumes_binded_top_level) | unique }}"
 
 ...
