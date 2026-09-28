@@ -62,6 +62,7 @@ argument_specs:
           List of binded directories to no create even if O(podman_quadlet_compose_create_bind_directories=true).
         type: list
         elements: str
+        default: []
 
       podman_quadlet_compose_additional_pod_config:
         description: |-
@@ -72,5 +73,47 @@ argument_specs:
           This parameter is taken into account after all other unit configuration done by the role,
           so it can override previously set parameters.
         type: dict
+
+
+  backup:
+    short_description: Backup volumes and binded data directories
+    description: |-
+      Backup volumes and binded data directories for already deployed containers.
+
+      B(Warning: this will only work with containers already deployed without modification to the compose file.)
+    version_added: "1.0"
+    author: Elinor Montmasson
+    options:
+      podman_quadlet_compose_src_directory:
+        description: Directory containing container compose files.
+        type: str
+        default: "./containers"
+
+      podman_quadlet_compose_src:
+        description: |-
+          YAML compose file to use to generate container quadlet files to install.
+          This file can be a jinja templatefile. In that case, it will be pre-processed by jinja2 before
+          being given to podlet.
+          Should be in O(podman_quadlet_compose_src_directory).
+        type: str
+        required: true
+
+      podman_quadlet_compose_user:
+        description: |-
+          User owning and running the containers.
+        type: str
+        default: root
+
+      podman_quadlet_compose_backup_dir:
+        description: Path to directory where backup archives are stored.
+        type: str
+        default: V(podman_quadlet_compose_src_directory)/backups
+
+      podman_quadlet_compose_ignore_bind_directories:
+        description: |-
+          List of binded directories to not backup.
+        type: list
+        elements: str
+        default: []
 
 ...

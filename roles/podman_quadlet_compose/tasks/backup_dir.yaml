@@ -1,0 +1,24 @@
+---
+
+- name: Archive directory
+  community.general.archive:
+    path: "{{ path }}"
+    dest: "{{ backup_tmp_dir.path }}/{{ archive_name }}"
+    format: zip
+
+- name: Fetch backup archive
+  ansible.posix.synchronize:
+    mode: pull
+    src: "{{ backup_tmp_dir.path }}/{{ archive_name }}"
+    dest: "{{ backup_path }}/"
+
+- name: Delete backup on host
+  ansible.builtin.file:
+    path: "{{ backup_tmp_dir.path }}/{{ archive_name }}"
+    state: absent
+
+- name: Display backup file path
+  ansible.builtin.debug:
+    msg: "Backup file for {{ path }} saved at {{ backup_path }}/{{ archive_name }}"
+
+...

@@ -1,0 +1,71 @@
+---
+
+- name: Get user information
+  tags: always
+  ansible.builtin.user:
+    name: "{{ podman_quadlet_compose_user }}"
+  register: user_info
+  check_mode: true
+  changed_when: false
+  failed_when: user_info.state is not defined or user_info.state != "present"
+
+
+- name: Generate compose file
+  ansible.builtin.import_tasks: generate_compose_file.yaml
+
+- name: Import binded volumes variables
+  ansible.builtin.include_vars:
+    file: bind_volumes.yaml
+
+
+- name: Stop containers during backup
+  become: true
+  become_user: "{{ podman_quadlet_compose_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "{{ (podman_quadlet_compose_user == 'root') | ternary('/run/user/' + user_info.uid | string, omit) }}"
+  ansible.builtin.systemd_service:
+    name: "{{ podman_quadlet_compose_src_templated.name }}-pod.service"
+    state: stopped
+    scope: "{{ (podman_quadlet_compose_user != 'root') | ternary('user', 'system') }}"
+
+
+- name: Create temporary backup dir
+  ansible.builtin.tempfile:
+    state: directory
+  register: backup_tmp_dir
+
+- name: Backup volumes
+  vars:
+    backup_date: "{{ now(fmt='%Y%m%d%H%M%S') }}"
+    backup_prefix: "{{ podman_quadlet_compose_src_templated.name }}/{{ inventory_hostname }}/{{ backup_date }}"
+    backup_path: "{{ podman_quadlet_compose_backup_dir }}/{{ backup_prefix }}"
+  block:
+    - name: Create destination directory
+      become: false
+      delegate_to: localhost
+      ansible.builtin.file:
+        path: "{{ backup_path }}"
+        state: directory
+
+    - name: Backup binded volumes
+      loop: "{{ podman_quadlet_compose_volumes_binded | reject('in', podman_quadlet_compose_ignore_bind_directories) }}"
+      loop_control:
+        loop_var: path
+      vars:
+        archive_name: "{{ path | replace('/', '-') | trim('-') }}.zip"
+      ansible.builtin.include_tasks: backup_dir.yaml
+
+    # TODOOOO Backup podman volumes
+
+
+- name: Restart containers
+  become: true
+  become_user: "{{ podman_quadlet_compose_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "{{ (podman_quadlet_compose_user == 'root') | ternary('/run/user/' + user_info.uid | string, omit) }}"
+  ansible.builtin.systemd_service:
+    name: "{{ podman_quadlet_compose_src_templated.name }}-pod.service"
+    state: restarted
+    scope: "{{ (podman_quadlet_compose_user != 'root') | ternary('user', 'system') }}"
+
+...

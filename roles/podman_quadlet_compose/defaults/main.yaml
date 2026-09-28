@@ -6,4 +6,6 @@ podman_quadlet_compose_create_bind_directories: true
 podman_quadlet_compose_keep_user_id: false
 podman_quadlet_compose_additional_pod_config: {}
 
+podman_quadlet_compose_backup_dir: "{{ podman_quadlet_compose_src_directory }}/backups"
+
 ...

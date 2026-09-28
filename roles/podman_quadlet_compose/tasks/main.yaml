@@ -10,20 +10,8 @@
   failed_when: user_info.state is not defined or user_info.state != "present"
 
 
-- name: Generate compose file from template
-  become: false
-  delegate_to: localhost
-  run_once: true
-  ansible.builtin.template:
-    src: "{{ podman_quadlet_compose_src_path }}"
-    dest: "{{ podman_quadlet_compose_src_templated_path  }}"
-  register: compose_template_res
-
-
-- name: Import YAML content of templated compose file
-  tags: always
-  ansible.builtin.set_fact:
-    podman_quadlet_compose_src_templated: "{{ lookup('ansible.builtin.file', podman_quadlet_compose_src_templated_path) | ansible.builtin.from_yaml }}"
+- name: Generate compose file
+  ansible.builtin.import_tasks: generate_compose_file.yaml
 
 
 # There is no easy way to ensure idempotency of the quadlet generation tasks especially regarding
