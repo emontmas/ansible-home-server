@@ -99,34 +99,46 @@
             state: "{{ item.state }}"
           loop: "{{ fstab_mounts }}"
 
-
-
-    - name: Add local network in firewalld home zone
-      tags: firewall
-      when: firewalld_enabled | default(false)
-      vars:
-        local_subnet: "{{ network_local_subnet | default(ansible_facts['default_ipv4']['network'] + '/' + ansible_facts['default_ipv4']['prefix']) }}"
-      ansible.builtin.command: firewall-cmd --zone=home --add-source={{ local_subnet }} --permanent
-      register: firewalld_cmd_res
-      changed_when: not ("ALREADY_ENABLED" in firewalld_cmd_res.stderr)
-      notify: Reload firewalld
-
     - name: Enable cockpit WebUI
       ansible.builtin.systemd_service:
         name: cockpit.socket
         enabled: true
         state: started
 
-    # Firewalld already provides a cockpit service
-    - name: Enable firewalld cockpit service
-      tags: firewall
+
+- name: Configure firewall
+  hosts: servers
+  tags: firewall
+  become: true
+  gather_facts: true
+  pre_tasks:
+    - name: Create firewalld services
       when: firewalld_enabled | default(false)
-      ansible.posix.firewalld:
-        service: cockpit
-        state: enabled
-        permanent: true
-        immediate: true
-        zone: home
+      loop: "{{ firewalld_local_services | default([]) }}"
+      vars:
+        service_description: "{{ item.service_description }}"
+        service_port: "{{ item.service_port }}"
+        service_protocol: "{{ item.service_protocol }}"
+      ansible.builtin.template:
+        src: "{{ service_template | default('firewalld-service.xml.j2') }}"
+        dest: /etc/firewalld/services/{{ item.service_name }}.xml
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload firewalld
+
+  tasks:
+    - name: Configure firewalld zones
+      when: firewalld_enabled | default(false)
+      loop: "{{ firewalld_config | default({}) | dict2items(key_name='name', value_name='rules') }}"
+      loop_control:
+        loop_var: zone
+      vars:
+        local_subnet: "{{ network_local_subnet | default(ansible_facts['default_ipv4']['network'] + '/' + ansible_facts['default_ipv4']['prefix']) }}"
+      ansible.builtin.include_tasks:
+        file: tasks/firewalld_configure_zone_rules.yaml
+        apply:
+          tags: firewall
 
   handlers:
     - name: Reload firewalld

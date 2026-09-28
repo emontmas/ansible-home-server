@@ -41,28 +41,11 @@
         name: qbt
         groups: "{{ jellyfin_media_group | default(jellyfin) }}"
 
-    - name: Configure firewalld services
-      tags: firewall
-      when: firewalld_enabled | default(false)
-      ansible.builtin.import_tasks: tasks/firewalld_services.yaml
-      vars:
-        zone: home
-        services:
-          - service_name: jellyfin
-            service_description: Jellyfin server
-            service_port: 8096
-            service_protocol: tcp
-          - service_name: qbittorrent-nox
-            service_description: QBittorent WebUI
-            service_port: 8080
-            service_protocol: tcp
-
 # containers:
 #   - src: compose file name.
 #     user: user owning the containers. Must already exist and have the necessary subuid / subgid configured.
 #     config_bind_directories: custom configuration for binded directories.
 #     ignore_bind_directories: binded directories to not create.
-#     firewalld_services: lists of firewalld services related to the containers to add and enable.
 
 - name: Configure podman containers
   hosts: servers
@@ -91,18 +74,5 @@
         name: podman_quadlet_compose
         apply:
           tags: containers
-
-
-    - name: Configure containers firewalld services
-      tags: firewall
-      when: firewalld_enabled | default(false)
-      loop: "{{ containers }}"
-      vars:
-        zone: home
-        services: "{{ item.firewalld_services }}"
-      ansible.builtin.include_tasks:
-        file: tasks/firewalld_services.yaml
-        apply:
-          tags: firewall
 
 ...

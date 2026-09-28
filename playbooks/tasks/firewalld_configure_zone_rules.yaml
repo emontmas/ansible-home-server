@@ -1,0 +1,13 @@
+---
+
+- name: Configure zone rule
+  loop: "{{ zone.rules }}"
+  vars:
+    base_params:
+      permanent: true
+      state: enabled
+      zone: "{{ zone.name }}"
+  ansible.posix.firewalld: "{{ base_params | combine(item) }}"
+  notify: Reload firewalld
+
+...
