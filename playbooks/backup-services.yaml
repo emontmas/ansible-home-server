@@ -1,13 +1,43 @@
 ---
 
-- name: Backup services
+- name: Backup jellyfin
   hosts: jellyfin_servers
+  tags: jellyfin
   gather_facts: false
   tasks:
     - name: Create jellyfin data backup
-      tags: jellyfin
+      vars:
+        jellyfin_backup_dir: "{{ backup_dir }}"
       ansible.builtin.import_role:
         name: jellyfin
+        tasks_from: backup.yaml
+
+- name: Backup containers volumes
+  hosts: servers
+  tags: containers
+  gather_facts: true
+  tasks:
+    - name: Get users informations
+      tags: always
+      loop:
+        - passwd
+        - group
+      ansible.builtin.getent:
+        database: "{{ item }}"
+
+    - name: Backup containers volumes
+      loop: "{{ containers }}"
+      vars:
+        users_facts: "{{ ansible_facts['getent_passwd'] }}"
+        groups_facts: "{{ ansible_facts['getent_group'] }}"
+
+        podman_quadlet_compose_src: "{{ item.src }}"
+        podman_quadlet_compose_user: "{{ item.user }}"
+        podman_quadlet_compose_ignore_bind_directories: "{{ item.ignore_bind_directories | default([]) }}"
+
+        podman_quadlet_compose_backup_dir: "{{ backup_dir }}"
+      ansible.builtin.include_role:
+        name: podman_quadlet_compose
         tasks_from: backup.yaml
 
 ...
