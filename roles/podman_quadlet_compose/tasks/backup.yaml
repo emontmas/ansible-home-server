@@ -36,8 +36,7 @@
 
 - name: Backup volumes
   vars:
-    backup_prefix: "{{ podman_quadlet_compose_src_templated.name }}/{{ inventory_hostname }}"
-    backup_path: "{{ podman_quadlet_compose_backup_dir }}/{{ backup_prefix }}"
+    backup_path: "{{ podman_quadlet_compose_backup_dir }}/{{ inventory_hostname }}"
   block:
     - name: Create destination directory
       become: false
