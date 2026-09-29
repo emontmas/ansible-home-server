@@ -2,7 +2,7 @@
 
 - name: Archive directory
   community.general.archive:
-    path: "{{ path }}"
+    path: "{{ path }}/*"  # Archive content not directory itself
     dest: "{{ backup_tmp_dir.path }}/{{ archive_name }}"
     format: zip
 

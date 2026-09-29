@@ -36,8 +36,7 @@
 
 - name: Backup volumes
   vars:
-    backup_date: "{{ now(fmt='%Y%m%d%H%M%S') }}"
-    backup_prefix: "{{ podman_quadlet_compose_src_templated.name }}/{{ inventory_hostname }}/{{ backup_date }}"
+    backup_prefix: "{{ podman_quadlet_compose_src_templated.name }}/{{ inventory_hostname }}"
     backup_path: "{{ podman_quadlet_compose_backup_dir }}/{{ backup_prefix }}"
   block:
     - name: Create destination directory
