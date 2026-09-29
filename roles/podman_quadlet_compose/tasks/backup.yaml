@@ -51,7 +51,7 @@
       loop_control:
         loop_var: path
       vars:
-        archive_name: "{{ path | replace('/', '-') | trim('-') }}.zip"
+        archive_name: "{{ path | replace('/', '-') | trim('-') }}"
       ansible.builtin.include_tasks: backup_dir.yaml
 
     # TODOOOO Backup podman volumes
