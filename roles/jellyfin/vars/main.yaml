@@ -1,0 +1,5 @@
+---
+
+jellyfin_remote_backup_dir: /var/lib/jellyfin/ansible
+
+...

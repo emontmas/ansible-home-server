@@ -3,7 +3,7 @@
 - name: Clean-up remaining backups from previous run
   when: jellyfin_clean_backups
   ansible.builtin.file:
-    path: /var/lib/jellyfin/ansible
+    path: "{{ jellyfin_remote_backup_dir }}"
     state: absent
 
 - name: Install jellyfin

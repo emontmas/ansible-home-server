@@ -61,10 +61,11 @@ argument_specs:
         type: str
         default: jellyfin
 
-      jellyfin_backup:
+      jellyfin_backup_dir:
         description: |-
-          Path to jellyfin backup .zip file to restore.
-          The backup file must have been generated through jellyfin built-in backup feature.
+          Path to directory containing jellyfin backup files to restore.
+
+          This must be a directory populated by a previous call to the V(backup) entry-point.
         type: str
 
       jellyfin_clean_backups:
@@ -99,6 +100,6 @@ argument_specs:
       jellyfin_backup_dir:
         description: Path to directory where backup archives are stored.
         type: str
-        default: $HOME/.local/share/jellyfin-backups
+        required: true
 
 ...

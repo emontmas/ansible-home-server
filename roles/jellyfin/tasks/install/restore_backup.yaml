@@ -1,9 +1,16 @@
 ---
 
 - name: Restore backup file
+  vars:
+    jellyfin_backup_file: "{{ query('ansible.builtin.fileglob',
+                                      jellyfin_backup_dir + '/' + inventory_hostname + '/*jellyfin*')
+                                | first | default('') }}"
+
+    jellyfin_remote_backup_file: "{{ jellyfin_remote_backup_dir }}/{{ jellyfin_backup_file | basename }}"
   when:
-    - jellyfin_backup is defined
-    - jellyfin_backup != ''
+    - jellyfin_backup_dir is defined
+    - jellyfin_backup_dir != ''
+    - jellyfin_backup_file != ''
   notify:
     - "jellyfin : Reload systemd daemon"
     - Restart Jellyfin server
@@ -17,14 +24,14 @@
 
     - name: Create destination file for backup
       ansible.builtin.file:
-        path: /var/lib/jellyfin/ansible
+        path: "{{ jellyfin_remote_backup_dir }}"
         state: directory
         mode: "0755"
 
     - name: Copy backup file
       ansible.builtin.copy:
-        src: "{{ jellyfin_backup }}"
-        dest: /var/lib/jellyfin/ansible/{{ jellyfin_backup | basename }}
+        src: "{{ jellyfin_backup_file }}"
+        dest: "{{ jellyfin_remote_backup_file }}"
         mode: "0644"
         owner: jellyfin
         group: jellyfin
