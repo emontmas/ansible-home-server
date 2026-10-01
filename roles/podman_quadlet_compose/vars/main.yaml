@@ -8,4 +8,7 @@ podman_quadlet_compose_podlet_pod_workdir: "{{ podman_quadlet_compose_podlet_wor
 podman_quadlet_compose_src_path: "{{ podman_quadlet_compose_src_directory }}/{{ podman_quadlet_compose_src }}"
 podman_quadlet_compose_src_templated_path: "{{ podman_quadlet_compose_podlet_workdir }}/{{ podman_quadlet_compose_name }}.yaml"
 
+podman_quadlet_compose_backup_archive_format: gz  # Must be supported by community.general.archive
+podman_quadlet_compose_backup_archive_extension: .tar.gz
+
 ...
