@@ -70,6 +70,8 @@
         podman_quadlet_compose_user: "{{ item.user | default(omit) }}"
         podman_quadlet_compose_config_bind_directories: "{{ item.config_bind_directories | default(omit) }}"
         podman_quadlet_compose_ignore_bind_directories: "{{ item.ignore_bind_directories | default([]) }}"
+
+        podman_quadlet_compose_backup_dir: "{{ (backup_dir + '/containers/' + item.src) if backup_dir is defined else '' }}"
       ansible.builtin.include_role:
         name: podman_quadlet_compose
         apply:
