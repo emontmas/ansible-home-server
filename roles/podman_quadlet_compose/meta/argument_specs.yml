@@ -107,7 +107,7 @@ argument_specs:
       podman_quadlet_compose_backup_dir:
         description: Path to directory where backup archives are stored.
         type: str
-        default: V(podman_quadlet_compose_src_directory)/backups
+        required: true
 
       podman_quadlet_compose_ignore_bind_directories:
         description: |-
