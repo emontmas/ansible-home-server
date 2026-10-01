@@ -74,6 +74,13 @@ argument_specs:
           so it can override previously set parameters.
         type: dict
 
+      podman_quadlet_compose_backup_dir:
+        description: |-
+          Backup directory containing volumes backups to restore.
+
+          This must be a directory populated by a previous call to the V(backup) entry-point.
+        type: str
+
 
   backup:
     short_description: Backup volumes and binded data directories
