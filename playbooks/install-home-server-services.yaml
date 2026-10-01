@@ -30,6 +30,8 @@
   roles:
     - role: jellyfin
       tags: jellyfin
+      vars:
+        jellyfin_backup_dir: "{{ (backup_dir + '/jellyfin') if backup_dir is defined else '' }}"
     - role: qbittorrent_nox
       tags: qbittorrent
 

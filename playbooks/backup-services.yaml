@@ -7,7 +7,7 @@
   tasks:
     - name: Create jellyfin data backup
       vars:
-        jellyfin_backup_dir: "{{ backup_dir }}"
+        jellyfin_backup_dir: "{{ backup_dir }}/jellyfin"
       ansible.builtin.import_role:
         name: jellyfin
         tasks_from: backup.yaml
