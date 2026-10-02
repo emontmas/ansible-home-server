@@ -26,49 +26,55 @@
         state: present
 
 
-    - name: Create admin user
-      tags: admin
-      ansible.builtin.user:
-        name: admin
-        groups: "{{ user_admin_groups | default(omit) }}"
-        password: "{{ user_admin_password }}"
-
-    - name: Add admin authorized SSH keys
-      tags: admin
-      ansible.posix.authorized_key:
-        user: admin
-        key: "{{ user_admin_ssh_pub_key }}"
-
-    # As of Ansible 13, the module community.general.sudoers doesn't support setting
-    # 'Defaults' directives. As it is desiered to allow admin user to use its own password,
-    # a template file is used instead for now.
-    - name: Configure admin sudo
-      tags: admin
-      ansible.builtin.template:
-        src: admin.sudoers.j2
-        dest: /etc/sudoers.d/admin
-        owner: root
-        group: root
-        mode: "0644"
-
-
-    - name: Create service users
+    - name: Configure users
       tags: users
-      loop: "{{ users | dict2items }}"
-      ansible.builtin.user: "{{ {'name': item.key} | combine(item.value) }}"
+      block:
+        - name: Create users
+          loop: "{{ users | dict2items }}"
+          vars:
+            # These are used for other tasks of this playbook
+            filter_out_keys:
+              - administrator
+              - authorized_key
 
-    - name: Force user home directories ownership
-      tags: users
-      loop: "{{ users | dict2items }}"
-      when:
-        - users_force_home_ownership | default(false)
-        - item.value.home is defined
-      ansible.builtin.file:
-        path: "{{ item.value.home }}"
-        state: directory
-        recurse: true
-        owner: "{{ item.key }}"
-        group: "{{ item.key }}"
+            params: "{{ item.value | dict2items | rejectattr('key', 'in', filter_out_keys) | items2dict }}"
+          ansible.builtin.user: "{{ {'name': item.key} | combine(params) }}"
+
+        - name: Add admin authorized SSH keys
+          loop: "{{ users | dict2items
+                    | selectattr('value.authorized_key', 'defined') }}"
+          ansible.posix.authorized_key:
+            user: "{{ item.key }}"
+            key: "{{ item.value.authorized_key }}"
+
+        # As of Ansible 13, the module community.general.sudoers doesn't support setting
+        # 'Defaults' directives. As it is desiered to allow admin user to use its own password,
+        # a template file is used instead for now.
+        - name: Configure sudo for administrators
+          loop: "{{ users | dict2items
+                    | selectattr('value.administrator', 'defined')
+                    | selectattr('value.administrator')
+                    | map(attribute='key') }}"
+          loop_control:
+            loop_var: user
+          ansible.builtin.template:
+            src: admin.sudoers.j2
+            dest: /etc/sudoers.d/{{ user }}
+            owner: root
+            group: root
+            mode: "0644"
+
+        - name: Force user home directories ownership
+          loop: "{{ users | dict2items }}"
+          when:
+            - users_force_home_ownership | default(false)
+            - item.value.home is defined
+          ansible.builtin.file:
+            path: "{{ item.value.home }}"
+            state: directory
+            recurse: true
+            owner: "{{ item.key }}"
+            group: "{{ item.key }}"
 
 
     - name: Configure mounts
