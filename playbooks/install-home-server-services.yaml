@@ -1,23 +1,22 @@
 ---
 
+- name: Load distro specific variables
+  hosts: servers
+  gather_facts: true
+  tags: always
+  vars_files:
+    - distro.yaml
+  tasks:
+    - name: Importing distro specific variables
+      ansible.builtin.include_vars: "{{ item }}"
+      loop: "{{ distro_vars_files }}"
+
+
 - name: Configure jellyfin servers
   hosts: jellyfin_servers
   become: true
   gather_facts: true
   pre_tasks:
-    - name: Importing distro specific variables
-      tags: always
-      ansible.builtin.include_vars: "{{ item }}"
-      loop: "{{ [lookup('ansible.builtin.first_found', params) | default(omit, true)] }}"
-      vars:
-        params:
-          files:
-            - "{{ ansible_facts['distribution'] | lower | replace(' ', '_') }}.yaml"
-            - "{{ ansible_facts['os_family'] | lower | replace(' ', '_') }}.yaml"
-          paths:
-            - vars
-          skip: true
-
     - name: Install jellyfin dependencies for portable installations
       tags: jellyfin
       when:

@@ -1,0 +1,13 @@
+---
+
+distro_vars_files_search_params:
+  files:
+    - "{{ ansible_facts['distribution'] | lower | replace(' ', '_') }}.yaml"
+    - "{{ ansible_facts['os_family'] | lower | replace(' ', '_') }}.yaml"
+  paths:
+    - vars
+  skip: true
+
+distro_vars_files: "{{ query('ansible.builtin.first_found', distro_vars_files_search_params) }}"
+
+...
