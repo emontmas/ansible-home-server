@@ -5,7 +5,7 @@
 #   - Systemd, comes with the installation
 #   - Python interpreter, required to run Ansible itself.
 
-base_packages_generic:
+base_packages_default:
   - cockpit
   - cockpit-networkmanager
   - cockpit-packagekit
@@ -41,6 +41,6 @@ base_packages_distro: {} # To be overwritten by distro specific var files
 base_packages_distro_keys: "{{ base_packages_distro | dict2items | map(attribute='key') }}"
 base_packages_distro_values: "{{ base_packages_distro | dict2items | map(attribute='value') }}"
 
-base_packages: "{{ (base_packages_generic | reject('in', base_packages_distro_keys)) + base_packages_distro_values }}"
+base_packages: "{{ (base_packages_host | default(base_packages_default) | reject('in', base_packages_distro_keys)) + base_packages_distro_values }}"
 
 ...
