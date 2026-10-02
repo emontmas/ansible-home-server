@@ -11,6 +11,7 @@ distro_vars_files_search_params:
     - "{{ distro_name | lower | replace(' ', '_') }}.yaml"
     - "{{ ansible_facts['os_family'] | lower | replace(' ', '_') }}.yaml"
   paths:
+    - "{{ inventory_dir }}/distros"
     - vars
   skip: true
 
