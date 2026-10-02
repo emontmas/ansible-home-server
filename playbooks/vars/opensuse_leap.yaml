@@ -1,6 +1,6 @@
 ---
 
-base_packages_distro:
+base_packages_distro_mapping:
   intel-ucode: ucode-intel
   linux-firmware-intel: kernel-firmware-intel
   man-db: man

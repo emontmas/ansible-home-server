@@ -12,8 +12,8 @@
       vars:
         params:
           files:
-            - "{{ ansible_facts['distribution'] | lower | replace(' ', '_') }}-packages.yaml"
-            - "{{ ansible_facts['os_family'] | lower | replace(' ', '_') }}-packages.yaml"
+            - "{{ ansible_facts['distribution'] | lower | replace(' ', '_') }}.yaml"
+            - "{{ ansible_facts['os_family'] | lower | replace(' ', '_') }}.yaml"
           paths:
             - vars
           skip: true

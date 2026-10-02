@@ -39,9 +39,9 @@ base_packages_default:
 base_packages_before_mapping: "{{ base_packages_host | default(base_packages_default)
                                     | reject('in', base_packages_exclude | default([])) }}"
 
-base_packages_distro: {} # To be overwritten by distro specific var files
+base_packages_distro_mapping: {} # To be overwritten by distro specific var files
 
-base_packages_distro_to_map: "{{ base_packages_distro | dict2items
+base_packages_distro_to_map: "{{ base_packages_distro_mapping | dict2items
                                   | selectattr('key', 'in', base_packages_before_mapping) }}"
 base_packages_distro_to_map_keys: "{{ base_packages_distro_to_map | map(attribute='key') }}"
 base_packages_distro_to_map_values: "{{ base_packages_distro_to_map | map(attribute='value') }}"
