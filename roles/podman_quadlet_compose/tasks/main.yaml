@@ -68,9 +68,9 @@
         state: absent
 
 
-- name: Import binded volumes variables
+- name: Import volumes variables
   ansible.builtin.include_vars:
-    file: bind_volumes.yaml
+    file: volumes.yaml
 
 - name: Create bind volume host directories
   loop: "{{ podman_quadlet_compose_volumes_binded }}"

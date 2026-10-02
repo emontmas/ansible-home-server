@@ -1,5 +1,10 @@
 ---
 
+- name: Create temporary backup dir
+  ansible.builtin.tempfile:
+    state: directory
+  register: backup_tmp_dir
+
 - name: Archive directory
   community.general.archive:
     path: "{{ path }}/*"  # Archive content not directory itself

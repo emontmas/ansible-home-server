@@ -13,9 +13,9 @@
 - name: Generate compose file
   ansible.builtin.import_tasks: generate_compose_file.yaml
 
-- name: Import binded volumes variables
+- name: Import volumes variables
   ansible.builtin.include_vars:
-    file: bind_volumes.yaml
+    file: volumes.yaml
 
 
 - name: Stop containers during backup
@@ -28,11 +28,6 @@
     state: stopped
     scope: "{{ (podman_quadlet_compose_user != 'root') | ternary('user', 'system') }}"
 
-
-- name: Create temporary backup dir
-  ansible.builtin.tempfile:
-    state: directory
-  register: backup_tmp_dir
 
 - name: Backup volumes
   vars:
@@ -53,7 +48,11 @@
         archive_name: "{{ path | replace('/', '-') | trim('-') }}"
       ansible.builtin.include_tasks: backup_dir.yaml
 
-    # TODOOOO Backup podman volumes
+    - name: Backup podman volumes
+      loop: "{{ podman_quadlet_compose_volumes_container | map(attribute='key') }}"
+      loop_control:
+        loop_var: volume
+      ansible.builtin.include_tasks: backup_volume.yaml
 
 
 - name: Restart containers

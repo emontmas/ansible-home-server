@@ -1,5 +1,7 @@
 ---
 
+# Binded directories
+
 podman_quadlet_compose_volumes_definitions:
   "{{ podman_quadlet_compose_src_templated.services | dict2items | map(attribute='value.volumes') | flatten }}"
 
@@ -28,5 +30,15 @@ podman_quadlet_compose_volumes_binded_top_level:
 # Concatenate final list of host directory binds
 podman_quadlet_compose_volumes_binded:
   "{{ (podman_quadlet_compose_volumes_binded_service_level + podman_quadlet_compose_volumes_binded_top_level) | unique }}"
+
+
+# Container directories
+
+podman_quadlet_compose_volumes_raw_data: "{{ podman_quadlet_compose_src_templated.volumes | dict2items }}"
+
+podman_quadlet_compose_volumes_container: "{{ podman_quadlet_compose_volumes_raw_data
+                | selectattr('value.driver', 'defined')
+                | rejectattr('value.driver', '==', 'local')
+              + podman_quadlet_compose_volumes_raw_data | rejectattr('value.driver', 'defined') }}"
 
 ...
