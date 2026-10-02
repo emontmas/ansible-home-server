@@ -25,6 +25,14 @@
         name: "{{ base_packages }}"
         state: present
 
+    - name: Enable and start base packages services
+      tags: base_packages
+      loop: "{{ post_install_start_services | default([]) }}"
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+
 
     - name: Configure users
       tags: users
@@ -102,12 +110,6 @@
             src: "{{ item.src | default(omit) }}"
             state: "{{ item.state }}"
           loop: "{{ fstab_mounts }}"
-
-    - name: Enable cockpit WebUI
-      ansible.builtin.systemd_service:
-        name: cockpit.socket
-        enabled: true
-        state: started
 
 
 - name: Configure firewall
