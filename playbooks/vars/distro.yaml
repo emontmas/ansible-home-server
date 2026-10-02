@@ -1,8 +1,14 @@
 ---
 
+distro_name: "{{ ansible_facts['distribution'] }}"
+distro_name_major_version: "{{ distro_name }}_{{ ansible_facts['distribution_major_version'] }}"
+distro_name_version: "{{ distro_name }}_{{ ansible_facts['distribution_version'] }}"
+
 distro_vars_files_search_params:
   files:
-    - "{{ ansible_facts['distribution'] | lower | replace(' ', '_') }}.yaml"
+    - "{{ distro_name_version | lower | replace(' ', '_') }}.yaml"
+    - "{{ distro_name_major_version | lower | replace(' ', '_') }}.yaml"
+    - "{{ distro_name | lower | replace(' ', '_') }}.yaml"
     - "{{ ansible_facts['os_family'] | lower | replace(' ', '_') }}.yaml"
   paths:
     - vars
