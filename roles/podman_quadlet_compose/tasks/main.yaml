@@ -96,6 +96,9 @@
   when:
     - podman_quadlet_compose_backup_dir is defined
     - podman_quadlet_compose_backup_dir != ''
+  vars:
+    backup_pod_host_dir: "{{ podman_quadlet_compose_backup_dir }}/{{ inventory_hostname }}"
+    backup_files: "{{ query('ansible.builtin.fileglob', backup_pod_host_dir + '/*') | map('basename') }}"
   block:
     - name: Stop pod containers
       become: true
@@ -112,9 +115,6 @@
       loop_control:
         loop_var: volume
       vars:
-        backup_pod_host_dir: "{{ podman_quadlet_compose_backup_dir }}/{{ inventory_hostname }}"
-        backup_files: "{{ query('ansible.builtin.fileglob', backup_pod_host_dir + '/*' + podman_quadlet_compose_backup_archive_extension) | map('basename') }}"
-
         backup_volume_archive_name: "{{ volume | replace('/', '-') | trim('-') }}{{ podman_quadlet_compose_backup_archive_extension }}"
       when: backup_volume_archive_name in backup_files
       ansible.builtin.unarchive:
@@ -123,7 +123,14 @@
           extra_opts:
             - "-p"
 
-    # TODO restore podman volumes
+    - name: Restore backup podman volume
+      loop: "{{ podman_quadlet_compose_volumes_container | map(attribute='key') }}"
+      loop_control:
+        loop_var: volume
+      vars:
+        backup_volume_archive_name: "{{ volume }}.tar"
+      when: backup_volume_archive_name in backup_files
+      ansible.builtin.include_tasks: restore_volume.yaml
 
 
 - name: Install quadlet units

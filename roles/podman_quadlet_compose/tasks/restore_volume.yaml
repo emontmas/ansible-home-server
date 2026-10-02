@@ -1,0 +1,28 @@
+---
+
+- name: Restore backup podman volume as user owner
+  become: true
+  become_user: "{{ podman_quadlet_compose_user }}"
+  block:
+    - name: Create temporary backup dir
+      ansible.builtin.tempfile:
+        state: directory
+      register: backup_tmp_dir
+
+    - name: Upload backup archive
+      ansible.posix.synchronize:
+        mode: push
+        src: "{{ backup_pod_host_dir }}/{{ backup_volume_archive_name }}"
+        dest: "{{ backup_tmp_dir.path }}/{{ backup_volume_archive_name }}"
+
+    - name: Import volume backup
+      containers.podman.podman_import:
+        volume: "{{ volume }}"
+        src: "{{ backup_tmp_dir.path }}/{{ backup_volume_archive_name }}"
+
+    - name: Delete backup on host
+      ansible.builtin.file:
+        path: "{{ backup_tmp_dir.path }}/{{ backup_volume_archive_name }}"
+        state: absent
+
+...
