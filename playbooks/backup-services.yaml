@@ -36,6 +36,7 @@
         podman_quadlet_compose_ignore_bind_directories: "{{ item.ignore_bind_directories | default([]) }}"
 
         podman_quadlet_compose_backup_dir: "{{ backup_dir }}/containers/{{ item.src }}"
+      when: (containers_limit is not defined) or (item.src is in containers_limit)
       ansible.builtin.include_role:
         name: podman_quadlet_compose
         tasks_from: backup.yaml
