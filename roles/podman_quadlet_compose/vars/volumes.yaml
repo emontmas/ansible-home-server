@@ -34,7 +34,7 @@ podman_quadlet_compose_volumes_binded:
 
 # Container directories
 
-podman_quadlet_compose_volumes_raw_data: "{{ podman_quadlet_compose_src_templated.volumes | dict2items }}"
+podman_quadlet_compose_volumes_raw_data: "{{ podman_quadlet_compose_src_templated.volumes | default({}) | dict2items }}"
 
 podman_quadlet_compose_volumes_container: "{{ podman_quadlet_compose_volumes_raw_data
                 | selectattr('value.driver', 'defined')
