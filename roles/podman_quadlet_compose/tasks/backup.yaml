@@ -22,7 +22,7 @@
   become: true
   become_user: "{{ podman_quadlet_compose_user }}"
   environment:
-    XDG_RUNTIME_DIR: "{{ (podman_quadlet_compose_user == 'root') | ternary('/run/user/' + user_info.uid | string, omit) }}"
+    XDG_RUNTIME_DIR: "{{ podman_quadlet_compose_user_xdg_user_dir }}"
   ansible.builtin.systemd_service:
     name: "{{ podman_quadlet_compose_src_templated.name }}-pod.service"
     state: stopped
@@ -60,7 +60,7 @@
   become: true
   become_user: "{{ podman_quadlet_compose_user }}"
   environment:
-    XDG_RUNTIME_DIR: "{{ (podman_quadlet_compose_user == 'root') | ternary('/run/user/' + user_info.uid | string, omit) }}"
+    XDG_RUNTIME_DIR: "{{ podman_quadlet_compose_user_xdg_user_dir }}"
   ansible.builtin.systemd_service:
     name: "{{ podman_quadlet_compose_src_templated.name }}-pod.service"
     state: restarted

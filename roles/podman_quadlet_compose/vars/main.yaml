@@ -11,4 +11,6 @@ podman_quadlet_compose_src_templated_path: "{{ podman_quadlet_compose_podlet_wor
 podman_quadlet_compose_backup_archive_format: gz  # Must be supported by community.general.archive
 podman_quadlet_compose_backup_archive_extension: .tar.gz
 
+podman_quadlet_compose_user_xdg_user_dir: "{{ (podman_quadlet_compose_user == 'root') | ternary('/run/user/' + user_info.uid | string, omit) }}"
+
 ...
