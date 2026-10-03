@@ -13,7 +13,7 @@ argument_specs:
       podman_quadlet_compose_src_directory:
         description: Directory containing container compose files.
         type: str
-        default: "./containers"
+        default: "V(inventory_dir)/containers"
 
       podman_quadlet_compose_src:
         description: |-
@@ -94,7 +94,7 @@ argument_specs:
       podman_quadlet_compose_src_directory:
         description: Directory containing container compose files.
         type: str
-        default: "./containers"
+        default: "V(inventory_dir)/containers"
 
       podman_quadlet_compose_src:
         description: |-

@@ -1,6 +1,6 @@
 ---
 
-podman_quadlet_compose_src_directory: ./containers
+podman_quadlet_compose_src_directory: "{{ inventory_dir }}/containers"
 podman_quadlet_compose_user: root
 podman_quadlet_compose_create_bind_directories: true
 podman_quadlet_compose_keep_user_id: false
