@@ -5,4 +5,11 @@ collections:
   - name: community.general
   - name: containers.podman
 
+roles:
+  - name: nginxinc.nginx
+    version: 0.26.0
+  - name: nginx_config
+    src: https://github.com/nginx/ansible-role-nginx-config.git
+    version: 3b3f508c713db68161527124192fac1841826bfc
+
 ...
