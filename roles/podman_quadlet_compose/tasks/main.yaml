@@ -9,6 +9,13 @@
   changed_when: false
   failed_when: user_info.state is not defined or user_info.state != "present"
 
+- name: Create podlet workdir
+  become: false
+  delegate_to: localhost
+  run_once: true
+  ansible.builtin.file:
+    path: "{{ podman_quadlet_compose_podlet_workdir }}"
+    state: directory
 
 - name: Generate compose file
   ansible.builtin.import_tasks: generate_compose_file.yaml
