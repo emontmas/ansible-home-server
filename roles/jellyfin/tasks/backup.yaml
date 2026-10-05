@@ -9,7 +9,7 @@
         Device="ansible-controller",
         DeviceId="79e26056-b8c9-4109-b453-5a245de814b5",
         Version="10.11.11",
-        Token="3686ad9df78a4c65b65dc422ecc3337b"
+        Token="{{ jellyfin_api_token }}"
     url: http://localhost:{{ jellyfin_port | default(8096) }}/Backup/Create
     method: POST
     body_format: json

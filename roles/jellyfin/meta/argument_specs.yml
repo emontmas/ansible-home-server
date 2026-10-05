@@ -102,4 +102,9 @@ argument_specs:
         type: str
         required: true
 
+      jellyfin_api_token:
+        description: API token used to interact with the jellyfin server API.
+        type: str
+        required: true
+
 ...
