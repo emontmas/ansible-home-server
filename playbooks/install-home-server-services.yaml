@@ -85,10 +85,12 @@
   hosts: nginx_servers
   roles:
     - role: nginxinc.nginx
+      tags: nginx_install
       vars:
         nginx_manage_repo: "{{ nginx_manage_repo_distro | default(false) }}"  # Rely on default distribution repositories by default
         nginx_branch: stable
     - role: nginx_config
+      tags: nginx_config
       vars:
         nginx_config_selinux: true
 
