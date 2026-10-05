@@ -1,7 +1,15 @@
 ---
 
-collections:
-  - name: ansible.posix
-  - name: community.general
+# The following collections are already part of the Debian ansible package:
+#   - ansible.posix
+#   - community.general
+#   - containers.podman
+
+roles:
+  - name: nginxinc.nginx
+    version: 0.26.0
+  - name: nginx_config
+    src: https://github.com/nginx/ansible-role-nginx-config.git
+    version: 3b3f508c713db68161527124192fac1841826bfc
 
 ...
