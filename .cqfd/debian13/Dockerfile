@@ -6,4 +6,4 @@ RUN apt update && \
         git
 
 ADD ansible-requirements.yaml ansible-requirements.yaml
-RUN ansible-galaxy install -r ansible-requirements.yaml
+RUN ansible-galaxy install -r ansible-requirements.yaml -p /etc/ansible/roles
