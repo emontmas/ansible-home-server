@@ -3,3 +3,6 @@ inventories
 # Directories containing temporary artifacts
 .podlet/
 backups/
+
+# Test files and scripts for development
+/test
