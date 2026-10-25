@@ -4,7 +4,7 @@ argument_specs:
   main:
     short_description: Install and configure a jellyfin server.
     description: Install and configure a jellyfin server.
-    version_added: "1.0"
+    version_added: "0.1"
     author: Elinor Montmasson
     options:
       jellyfin_packages:
@@ -78,7 +78,7 @@ argument_specs:
   uninstall:
     short_description: Uninstall a jellyfin server. B(Not yet implemented)
     description: Uninstall a jellyfin server. B(Not yet implemented)
-    version_added: "1.0"
+    version_added: "0.1"
     author: Elinor Montmasson
     options:
       jellyfin_packages:
@@ -94,7 +94,7 @@ argument_specs:
       Create a backup of a jellyfin server configuration. It does not backup the medias in themselves.
     description: |-
       Create a backup of a jellyfin server configuration. It does not backup the medias in themselves.
-    version_added: "1.0"
+    version_added: "0.1"
     author: Elinor Montmasson
     options:
       jellyfin_backup_dir:

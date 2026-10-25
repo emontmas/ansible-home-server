@@ -7,7 +7,7 @@ argument_specs:
       Generate from a compose file and install podman containers as quadlet units using podlet.
       The quadlet units are installed and run under a specified user.
       Unit generation is performed on V(localhost) which must have pdolet installed.
-    version_added: "1.0"
+    version_added: "0.1"
     author: Elinor Montmasson
     options:
       podman_quadlet_compose_src_directory:
@@ -88,7 +88,7 @@ argument_specs:
       Backup volumes and binded data directories for already deployed containers.
 
       B(Warning: this will only work with containers already deployed without modification to the compose file.)
-    version_added: "1.0"
+    version_added: "0.1"
     author: Elinor Montmasson
     options:
       podman_quadlet_compose_src_directory:
