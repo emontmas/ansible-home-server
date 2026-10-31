@@ -18,6 +18,10 @@
   gather_facts: true
   vars_files:
     - packages.yaml
+  roles:
+    - role: package_repositories
+      vars:
+        package_repositories_repos: "{{ host_package_repositories | default([]) }}"
   tasks:
     - name: Install base packages
       tags: base_packages
