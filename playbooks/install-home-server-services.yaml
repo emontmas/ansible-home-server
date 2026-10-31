@@ -83,6 +83,7 @@
 - name: Configure nginx server
   tags: nginx
   hosts: nginx_servers
+  become: true
   roles:
     - role: nginxinc.nginx
       tags: nginx_install
