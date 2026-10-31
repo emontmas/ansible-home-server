@@ -1,0 +1,19 @@
+---
+
+- name: Configure package repositories
+  vars:
+    repos: "{{ package_repositories_repos }}"
+  block:
+    - name: Configure apt repositories
+      when: ansible_facts['pkg_mgr'] == 'apt'
+      ansible.builtin.include_tasks: apt.yaml
+
+    - name: Configure dnf repositories
+      when: ansible_facts['pkg_mgr'] in ['dnf', 'dnf5']
+      ansible.builtin.include_tasks: dnf.yaml
+
+    - name: Configure zypper repositories
+      when: ansible_facts['pkg_mgr'] == "zypper"
+      ansible.builtin.include_tasks: zypper.yaml
+
+...

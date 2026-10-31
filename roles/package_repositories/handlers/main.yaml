@@ -1,0 +1,6 @@
+---
+
+- name: Update apt cache
+  ansible.builtin.command: apt update
+
+...

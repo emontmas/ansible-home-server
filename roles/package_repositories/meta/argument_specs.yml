@@ -1,0 +1,27 @@
+---
+
+argument_specs:
+  main:
+    short_description: Configure package manager repositories
+    description: |-
+      Configure package manager repositories.
+
+      This role is a simple wrapper around existing package repositories modules
+      and simply forwards the provided repo configurations to the correct module.
+
+      Currently supported package manager:
+        - apt       --> ansible.builtin.deb822_repository
+        - dnf/yum   --> ansible.builtin.yum_repository
+        - zypper    --> community.general.zypper_repository
+    version_added: "0.1"
+    author: Elinor Montmasson
+    options:
+      package_repositories_repos:
+        description: |-
+          Repository configuration parameters forwarded to the underlying module.
+          See the module documentation associated to your package manager for more details.
+        type: list
+        elements: dict
+
+
+...

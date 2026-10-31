@@ -1,0 +1,7 @@
+---
+
+- name: Configure dnf repository
+  loop: "{{ repos }}"
+  ansible.builtin.yum_repository: "{{ item }}"
+
+...

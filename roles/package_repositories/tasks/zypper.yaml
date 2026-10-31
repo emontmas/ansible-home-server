@@ -1,0 +1,7 @@
+---
+
+- name: Configure zypper repository
+  loop: "{{ repos }}"
+  community.general.zypper_repository: "{{ item }}"
+
+...
